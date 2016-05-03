@@ -97,6 +97,39 @@ writeString :: [Char] -> Char
 writeString x = show x
 
 
+---------------------------------
+
+
+--writeInt
+
+main = do
+    x = readInt
+    show x
+
+
+--writeChar
+
+
+main = do
+    x = readChar
+    show x
+
+
+--writeReal
+
+main = do
+    x = readReal
+    show x
+
+
+--writeString
+
+main = do
+    x = readString
+    show x
+
+
+
 
 
 
