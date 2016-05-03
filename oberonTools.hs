@@ -27,4 +27,16 @@ data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
 								procedureProcedures :: [Procedure] } deriving (Show)
 
+data ProcedureStack = ProcedureStack{
+	levels :: [Procedure]
+}deriving(Show)
+
+pushProcedureToStack
+  :: Procedure -> ProcedureStack -> ProcedureStack
+pushProcedureToStack p (ProcedureStack{levels = l}) = ProcedureStack{levels=(p:l)}
+
+lookProcedureToStack :: ProcedureStack -> Maybe Procedure
+lookProcedureToStack (ProcedureStack{levels = (x:xs)}) = Just x
+lookProcedureToStack (ProcedureStack{levels = []}) = Nothing
+
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
