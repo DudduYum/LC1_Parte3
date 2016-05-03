@@ -11,7 +11,6 @@ $validChar  = [^\"]                     -- Carattere in ascii tranne i doppi api
 tokens :-
 
   $white+				            ;
-  
   -- Keywords
   "INTEGER"                 { \s -> KW_TokenInteger }
   "REAL"                    { \s -> KW_TokenReal }
@@ -123,4 +122,5 @@ data Token =
   TokenValidChar Char             |
   TokenValidString String
 	deriving (Eq,Show)
+
 }
