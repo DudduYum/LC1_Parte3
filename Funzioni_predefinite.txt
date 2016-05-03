@@ -1,0 +1,102 @@
+
+
+Procedure:
+
+writeInt
+
+writeReal
+
+writeChar
+
+writeString
+
+
+Funzioni:
+
+readInt
+
+readReal
+
+readChar
+
+readString
+
+
+-------------------------------------
+
+
+Serve utilizzare input e output
+
+
+--import Char
+
+
+
+readInt :: Char -> Int
+
+x <- getLine
+
+y = read x :: Int
+
+return y
+
+++++
+
+readReal :: Char -> Float
+
+x <- getLine
+
+y = read x :: Float
+
+return y
+
+++++
+
+readChar :: Char -> Char
+
+x <- getLine
+
+return x
+
+++++
+
+readString :: [Char] -> Char
+
+x <- getLine
+
+return x
+
+
+__________
+
+
+
+writeInt :: Int -> Char
+
+show x
+
+++++
+
+writeChar :: Char -> Char
+
+show x
+
+++++
+
+writeReal :: Float -> Char
+
+show x
+
+++++
+
+writeString :: [Char] -> Char
+
+show x
+
+
+
+
+
+
+
+
