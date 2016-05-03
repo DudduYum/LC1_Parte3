@@ -73,25 +73,25 @@ __________
 
 writeInt :: Int -> Char
 
-show x
+writeInt x = show x
 
 ++++
 
 writeChar :: Char -> Char
 
-show x
+writeChar x = show x
 
 ++++
 
 writeReal :: Float -> Char
 
-show x
+writeReal x = show x
 
 ++++
 
 writeString :: [Char] -> Char
 
-show x
+writeString x = show x
 
 
 
