@@ -2,14 +2,14 @@ CC=ghc
 
 all: com
 
-com: oberonTok.hs oberonGra.hs com.hs
+com: oberonLexer.hs oberonParser.hs oberonTools.hs
 	CC --make com 
 
-oberonGra.hs : oberon.y
-	happy -o obertonGra.hs oberon.y
+oberonParser.hs : oberonParser.y
+	happy -o oberonParser.hs oberonParser.y
 
-oberonTok.hs : oberon.x
-	alex -o obertonTok.hs oberon.x
+oberonLexer.hs : oberonLexer.x
+	alex -o oberonLexer.hs oberonLexer.x
 
 clean:
-	rm -f com obertonGra.hs obertonTok.hs *.o *.hi
+	rm -f com oberonParser.hs oberonLexer.hs *.o *.hi
