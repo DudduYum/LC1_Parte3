@@ -5,6 +5,7 @@ module Main (main) where
 %wrapper "basic"
 
 $identifier = [a-zA-Z] 		--
+$digit = 0-9   -- numeri
 
 tokens :-
 
@@ -16,6 +17,7 @@ tokens :-
   "BOOLEAN"     { \s -> TokBool }
   "SET"         { \s -> TokSet }
   "Function"    { \s -> TokFunc }
+  "Tree"        { \s -> TokTree}
   $identifier [$identifier \_ \']*   { \s -> IdenTok s}
 
 {
@@ -28,10 +30,11 @@ data Token =
 	TokReal |
 	TokBool |
 	TokSet  |
-	TokFunc 
+	TokFunc |
+  TokTree
 	deriving (Eq,Show)
 
-main = do
-  s <- getContents
-  print (alexScanTokens s)
+-- main = do
+--    s <- getContents
+--    print (alexScanTokens s)
 }

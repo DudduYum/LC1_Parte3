@@ -1,8 +1,15 @@
 CC=ghc
 
+all: com
 
-exe: oberon.hs
-	CC -o exe oberon.hs
+com: oberonTok.hs oberonGra.hs com.hs
+	CC --make com 
 
-oberon.hs: oberon.x
-	alex oberon.x
+oberonGra.hs : oberon.y
+	happy -o obertonGra.hs oberon.y
+
+oberonTok.hs : oberon.x
+	alex -o obertonTok.hs oberon.x
+
+clean:
+	rm -f com obertonGra.hs obertonTok.hs *.o *.hi
