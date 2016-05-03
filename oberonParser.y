@@ -67,6 +67,8 @@ import OberonTools
 
 %%
 
+
+
 {
 parseError :: [Token] -> a
 parseError _ = error "Parse errore"

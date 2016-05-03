@@ -1,0 +1,31 @@
+STRUTTURA DATI
+
+Secondo me potrebbero esserci 3 tibi base:
+- Program
+- Procedure
+- Attribute
+
+
+class Attribute
+{
+	enum Type { STRING, CHAR, INT, FLOAT, BOOL, POINTER, ARRAY }
+
+	bool m_constant;
+	Type m_tpye;
+	void* m_value;
+	bool m_passedByReference;
+	string m_name;
+};
+
+class Procedure
+{
+	std::vector<Procedure> m_procedures;
+	std::vector<Attribute> m_attributes;
+
+	string m_name;
+}
+
+class Program
+{
+	std::vector<Procedure> m_procedures;
+}
