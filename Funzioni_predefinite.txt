@@ -1,5 +1,8 @@
 
 
+// Forse le procedure di write utilizzano al loro interno le funzioni di read
+// Da verificare...
+
 Procedure:
 
 writeInt
