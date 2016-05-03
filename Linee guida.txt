@@ -1,0 +1,41 @@
+RICONOSCIMENTO VALORI TIPI BASE:
+numeri interi 	  	-> 0...9
+numero float 	  	-> numero intero , numero intero
+caratteri singoli 	-> " ASCII "
+stringhe			-> " {ASCII} "
+booleani			-> TRUE | FALSE
+identificatore		-> a...zA...z (numero intero | a...zA...z)*
+
+RICONOSCIMENTO DICHIARAZIONI VARIABILI
+tipologie variabili:
+	- numeri interi 	-> "INTEGER"
+	- numero float 	  	-> "REAL"
+	- caratteri singoli -> "CHAR"
+	- stringhe			-> "ARRAY n OF CHAR"
+	- booleani			-> "BOOLEAN"
+	- array				-> "ARRAY n OF type"
+	- pointers			-> "POINTER TO type"
+	- procedure			-> "PROCEDURE" parametri formali
+
+dichiarazione di variabili:
+"VAR" identificatore("," identificatore)* ":" type
+
+PROCEDURE
+dichiarazione procedura:
+	"PROCEDURE" nomeProcedura [parametriFormali] [":" type]
+	sequenzaDiDichiarazioni
+	["BEGIN" sequenzaIstruzioni] "END" nomeProcedura
+
+parametriFormali:
+	"(" identificatore ":" type ["," identificatore ":" type]* ")"
+
+sequenzaDiDichiarazioni:
+	dichiarazione di variabili
+	dichiarazione procedure
+
+
+
+Cose che non faremo:
+- Oberon riconosce come caratteri, oltre a singoli caratteri racchiusi tra doppi apici,
+  anche numero esadecimali segui da una "X", noi riconosceremo solamente caratteri singoli racchiusta da doppi apici
+- Le stringhe non possono contenere doppi apici e non verrà gestito l'escape dei caratteri (per semplificarci la vita)
