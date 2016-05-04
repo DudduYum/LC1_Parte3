@@ -21,13 +21,13 @@ data Attribute = Attribute {	attributeName :: String,
 								integerArrayValue :: [Integer],
 								charArrayValue :: [Char],
 								isConstant :: Bool,
-								isPassedByReference :: Bool } deriving (Show)								
+								isPassedByReference :: Bool } deriving (Show)
 
 data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
 								procedureProcedures :: [Procedure] } deriving (Show)
 
-data ProcedureStack = ProcedureStack { levels :: [Procedure] }deriving(Show)
+data ProcedureStack = ProcedureStack { levels :: [Procedure] , deaph :: [Int] }deriving(Show)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
@@ -48,14 +48,22 @@ defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
 								procedureProcedures = [] }
 
-pushProcedureToStack :: Procedure -> ProcedureStack -> ProcedureStack
-pushProcedureToStack p (ProcedureStack { levels = l } ) = ProcedureStack { levels = (p : l) }
+defaultProcedureStack = ProcedureStack {
+ 								levels = [] ,
+								deaph = [0] }
 
-lookProcedureToStack :: ProcedureStack -> Maybe Procedure
-lookProcedureToStack (ProcedureStack { levels = (x:xs) }) = Just x
-lookProcedureToStack (ProcedureStack { levels = [] }) = Nothing
+-- serve per creare lo stack di procedure (per gestire la profondita di chiamate)
+pushProcedureToStack :: Procedure -> Int -> ProcedureStack -> ProcedureStack
+pushProcedureToStack p newDepth (ProcedureStack { levels = l , deaph = oldDeaph} ) = ProcedureStack { levels = (p : l) ,deaph = (newDepth : oldDeaph)}
+
+lookProcedureToStack :: ProcedureStack -> (Maybe Procedure , Int)
+lookProcedureToStack (ProcedureStack { levels = (x:xs) , deaph = (y:ys) }) = (Just x , y)
+lookProcedureToStack (ProcedureStack { levels = []  }) = (Nothing , 0)
 
 addAttributeToProcedure :: Procedure -> Attribute -> Procedure
 addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName proc),
 												attributes = (attributes proc) ++ [att],
 												procedureProcedures = (procedureProcedures proc) }
+
+-- lookUpForDefinition ::
+-- lookUpForDefinition atr index (x:xs) = 
