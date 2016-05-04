@@ -86,7 +86,10 @@ type 					: 	KW_INTEGER
 						|	PointerType
 						|	ProcedureType
 
-ArrayType				: 	KW_ARRAY lenght KW_OF type
+ArrayType				:  KW_ARRAY lengthList KW_OF type
+
+lenghtList : 	lenght
+						|	lenght ',' lenghtList
 
 lenght					:	ConstExpression
 
@@ -150,7 +153,7 @@ MulOperatorList			:	MulOperator factor
 factor	 				:	integerNum
 						|	realNum
 						|	'"' validChar '"'
-						|	'"' validString '"' 
+						|	'"' validString '"'
 						|	designator
 						|	designator ActualParameters
 						|	"(" expression ")"
