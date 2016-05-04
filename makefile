@@ -3,7 +3,7 @@ CC=ghc
 all: com
 
 com: oberonLexer.hs oberonParser.hs oberonTools.hs
-	CC --make com 
+	ghc -o OLike oberonLexer.hs oberonParser.hs oberonTools.hs
 
 oberonParser.hs : oberonParser.y
 	happy -o oberonParser.hs oberonParser.y
@@ -12,4 +12,4 @@ oberonLexer.hs : oberonLexer.x
 	alex -o oberonLexer.hs oberonLexer.x
 
 clean:
-	rm -f com oberonParser.hs oberonLexer.hs *.o *.hi
+	rm -f OLike oberonParser.hs oberonLexer.hs *.o *.hi

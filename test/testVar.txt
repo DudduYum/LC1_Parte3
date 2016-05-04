@@ -1,1 +1,4 @@
-i, j, k : INTEGER 
+PROCEDURE proc;
+	PROCEDURE p2;
+	END p2
+END proc

@@ -1,13 +1,10 @@
 {
 module Main where
-import Oberon
+import OberonLexer
 import OberonTools
-
-let depth = 0
-let proceduresStack = []
 }
 
-%name newl
+%name oLikeParse
 %tokentype { Token }
 %error { parseError }
 
@@ -53,195 +50,207 @@ let proceduresStack = []
   '='                   { KW_TokenEquel }
   '#'                   { KW_TokenDiesis }
   '<'                   { KW_TokenMinor }
-  '<='                  { KW_TokenMinorEqual }
+  KW_MinorEqual         { KW_TokenMinorEqual }
   '>'                   { KW_TokenMajor }
-  '<='                  { KW_TokenMajorEqual }
-  ':='                  { KW_TokenAssignment }
-  identifier 			{ TokenVariableIdentifier $$ }
+  KW_MajorEqual         { KW_TokenMajorEqual }
+  KW_Assignment         { KW_TokenAssignment }
+  '.'					          { KW_TokenPoint }
+  ','         					{ KW_TokenComa }
+  ':'					          { KW_TokenColon }
+  ';'         					{ KW_TokenSemiColon }
+  '('         					{ KW_TokenOpenBracket }
+  ')'         					{ KW_TokenClosedBracket }
+  '['         					{ KW_TokenOpenSquareBracket }
+  ']'         					{ KW_TokenClosedSquareBracket }
+  identifier 			      { TokenVariableIdentifier $$ }
   integerNum            { TokenIntegerNumber $$ }
-  realNum 				{ TokenRealNumber $$ }
+  realNum 				      { TokenRealNumber $$ }
   validChar             { TokenValidChar $$ }
-  validString        	{ TokenValidString $$ }
-
--- %right in
--- %nonassoc '>' '<'
--- %left '+' '-'
--- %left '*' '/'
--- %left NEG
+  validString        	  { TokenValidString $$ }
 
 %%
 
-IdentifiersList 		: 	identifier
-						|	identifier ',' IdentifiersList
+ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier   {
+                                                                          do
+                                                                            let newProc = $1  -- Crea la nuova procedura
+                                                                            let procBody = $3
+                                                                            addProcedureToProcedure newProc procBody
+                                                                        }
 
-baseTypes				:	KW_INTEGER
-						|	KW_REAL
-						|	KW_BOOLEAN
-						| 	KW_POINTER_TO
+IdentifiersList 		: 	identifier							        { putStrLn("A") }
+						        |	  identifier ',' IdentifiersList  { putStrLn("B") }
 
-type 					: 	KW_INTEGER
-						|	KW_REAL
-						|	KW_BOOLEAN
-						|	ArrayType
-						|	PointerType
-						|	ProcedureType
+--baseTypes				:	KW_INTEGER
+--						|	KW_REAL
+--						|	KW_BOOLEAN
+--						| 	KW_POINTER_TO
 
-ArrayType				:  KW_ARRAY lengthList KW_OF type
+--type 					: 	KW_INTEGER
+--						|	KW_REAL
+--						|	KW_BOOLEAN
+--						|	ArrayType
+--						|	PointerType
+--						|	ProcedureType
 
-lenghtList : 	lenght
-						|	lenght ',' lenghtList
+--ArrayType				:  KW_ARRAY lengthList KW_OF type
 
-lenght					:	ConstExpression
+--lenghtList 				: 	lenght
+--						|	lenght ',' lenghtList
 
-PointerType				: 	KW_POINTER_TO type
+--lenght					:	ConstExpression
 
-ProcedureType 			:	KW_PROCEDURE
-						|	KW_PROCEDURE FormalParameters
+--PointerType				: 	KW_POINTER_TO type
 
-VariableDeclaration		:	IdentifiersList ':' type
+--ProcedureType 			:	KW_PROCEDURE
+--						|	KW_PROCEDURE FormalParameters
 
-ConstantDeclaration		: 	identifier '=' ConstExpression
+--VariableDeclaration		:	IdentifiersList ':' type
 
-ConstExpression			: 	expression
+--ConstantDeclaration		: 	identifier '=' ConstExpression
 
-designator				:	identifier
-						|	identifier designatorHelper
+--ConstExpression			: 	expression
 
-designatorHelper		: 	'.' designator
-						|	'[' ExpList ']'
-						|	'[' ExpList ']' designatorHelper
+--designator				:	identifier
+--						|	identifier designatorHelper
 
-ExpList					: 	expression
-						|	expression ',' ExpList
+--designatorHelper		: 	'.' designator
+--						|	'[' ExpList ']'
+--						|	'[' ExpList ']' designatorHelper
 
-expression 				: 	SimpleExpression
-						| 	SimpleExpression relation SimpleExpression
+--ExpList					: 	expression
+--						|	expression ',' ExpList
 
-relation				: 	'='
-						| 	'#'
-						| 	'<'
-						| 	'<='
-						| 	'>'
-						| 	'>='
+--expression 				: 	SimpleExpression
+--						| 	SimpleExpression relation SimpleExpression
 
-SimpleExpression		:	term
-						|	term AddOperatorList
-						|	'+' term
-						|	'-' term
-						|	'+' term AddOperatorList
-						|	'-' term AddOperatorList
+--relation				: 	'='
+--						| 	'#'
+--						| 	'<'
+--						| 	KW_MinorEqual
+--						| 	'>'
+--						| 	KW_MajorEqual
 
-AddOperator				:	'+'
-						|	'-'
-						|	KW_OR
+--SimpleExpression		:	term
+--						|	term AddOperatorList
+--						|	'+' term
+--						|	'-' term
+--						|	'+' term AddOperatorList
+--						|	'-' term AddOperatorList
 
-AddOperatorList			:	AddOperator term
-						|	AddOperator term AddOperatorList
+--AddOperator				:	'+'
+--						|	'-'
+--						|	KW_OR
 
-term 					:	factor
-						|	factor MulOperatorList
+--AddOperatorList			:	AddOperator term
+--						|	AddOperator term AddOperatorList
 
-MulOperator 			:	'*'
-						|	'/'
-						|	KW_DIV
-						| 	KW_MOD
-						|	'&'
+--term 					:	factor
+--						|	factor MulOperatorList
 
-MulOperatorList			:	MulOperator factor
-						|	MulOperator factor MulOperatorList
+--MulOperator 			:	'*'
+--						|	'/'
+--						|	KW_DIV
+--						| 	KW_MOD
+--						|	'&'
 
-factor	 				:	integerNum
-						|	realNum
-						|	'"' validChar '"'
-						|	'"' validString '"'
-						|	designator
-						|	designator ActualParameters
-						|	"(" expression ")"
-						|	"~" factor
+--MulOperatorList			:	MulOperator factor
+--						|	MulOperator factor MulOperatorList
 
-ActualParameters		: 	"(" ")"
-						|	"(" ExpList ")"
+--factor	 				:	integerNum
+--						|	realNum
+--						|	'"' validChar '"'
+--						|	'"' validString '"'
+--						|	designator
+--						|	designator ActualParameters
+--						|	'(' expression ')'
+--						|	'~' factor
 
-statement 				:	assignment
-						|	ProcedureCall
-						|	IfStatement
-						|	CaseStatement
-						| 	WhileStatement
-						|	RepeatStatement
-						|	LoopStatement
-						|	KW_EXIT
-						|	KW_RETURN
-						|	KW_RETURN expression
+--ActualParameters		: 	'(' ')'
+--						|	'(' ExpList ')'
 
-assignment 				:	designator ':=' expression
+--statement 				:	assignment
+--						|	ProcedureCall
+--						|	IfStatement
+--						|	CaseStatement
+--						| 	WhileStatement
+--						|	RepeatStatement
+--						|	LoopStatement
+--						|	KW_EXIT
+--						|	KW_RETURN
+--						|	KW_RETURN expression
 
-ProcedureCall 			:	designator
-						|	designator ActualParameters
+--assignment 				:	designator KW_Assignment expression
 
-StatementSequence 		:	statement
-						|	statement ';' StatementSequence
+--ProcedureCall 			:	designator
+--						|	designator ActualParameters
 
-IfStatement 			:	KW_IF expression KW_THEN StatementSequence KW_END
-						|	KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
-						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
-						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
+--StatementSequence 		:	statement
+--						|	statement ';' StatementSequence
 
-ElseIfList 				:	KW_ELSIF expression KW_THEN StatementSequence
-						|	KW_ELSIF expression KW_THEN StatementSequence ElseIfList
+--IfStatement 			:	KW_IF expression KW_THEN StatementSequence KW_END
+--						|	KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
+--						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
+--						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
 
-CaseStatement 			: 	KW_CASE expression KW_OF Case KW_END
-						|	KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
-						|	KW_CASE expression KW_OF CaseList KW_END
-						|	KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
+--ElseIfList 				:	KW_ELSIF expression KW_THEN StatementSequence
+--						|	KW_ELSIF expression KW_THEN StatementSequence ElseIfList
 
-Case 					:	CaseLabelList ':' StatementSequence
+--CaseStatement 			: 	KW_CASE expression KW_OF Case KW_END
+--						|	KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
+--						|	KW_CASE expression KW_OF CaseList KW_END
+--						|	KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
 
-CaseLabelList 			:	CaseLabels
-						|	CaseLabels ',' CaseLabelList
+--Case 					:	CaseLabelList ':' StatementSequence
 
-CaseLabels 				:	ConstExpression
-						|	ConstExpression '..' ConstExpression
+--CaseLabelList 			:	CaseLabels
+--						|	CaseLabels ',' CaseLabelList
 
-WhileStatement 			:	KW_WHILE expression KW_DO StatementSequence KW_END
+--CaseLabels 				:	ConstExpression
+--						|	ConstExpression '..' ConstExpression
 
-RepeatStatement			:	KW_REPEAT StatementSequence KW_UNTIL expression
+--WhileStatement 			:	KW_WHILE expression KW_DO StatementSequence KW_END
 
-LoopStatement 			:	KW_LOOP StatementSequence KW_END
+--RepeatStatement			:	KW_REPEAT StatementSequence KW_UNTIL expression
 
-ProcedureDeclaration	:	ProcedureHeading ';' ProcedureBody identifier
+--LoopStatement 			:	KW_LOOP StatementSequence KW_END
 
-ProcedureHeading		:	KW_PROCEDURE identifier 								{
-																						do
-																							let tempStack = createProcedure $2 proceduresStack
-																							let proceduresStack = tempStack
-																					}
-						| 	KW_PROCEDURE identifier FormalParameters
+ProcedureHeading		:	KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
+--						| 	KW_PROCEDURE identifier FormalParameters
 
-ProcedureBody			: 	DeclarationSequence KW_END
-						|	DeclarationSequence KW_BEGIN StatementSequence KW_END
+ProcedureBody			: KW_END                                    { Nothing }
+                  | DeclarationSequence KW_END								{ Just $1 }
+--						|	DeclarationSequence KW_BEGIN StatementSequence KW_END 	{ }
 
-DeclarationSequence		:	KW_CONST ConstDeclaration ';'
-						|	KW_VAR VariableDeclaration ';'
-						|	ProcedureDeclaration
+DeclarationSequence		:	 ProcedureDeclaration                 { $1 }
+--DeclarationSequence		:	KW_CONST ConstDeclaration ';'
+--						|	KW_VAR VariableDeclaration ';'
+--						|	ProcedureDeclaration
 
-FormalParameters 		:	'(' ')'
-						|	'(' FPSectionList ')'
-						|	'(' FPSectionList ')' ':' type
+--ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
+--                          |   ProcedureDeclaration ';' ProcedureDeclarationList { $3:[$1] }
 
-FPSection 				:	IdentifiersList ':' FormalType
-						|	KW_VAR IdentifiersList ':' FormalType
+--FormalParameters 		:	'(' ')'
+--						|	'(' FPSectionList ')'
+--						|	'(' FPSectionList ')' ':' type
 
-FPSectionList 			: 	FPSection
-						|	FPSection ';' FPSectionList
+--FPSection 				:	IdentifiersList ':' FormalType
+--						|	KW_VAR IdentifiersList ':' FormalType
 
-FormalType 				: 	baseTypes
-						|	KW_ARRAY KW_OF baseTypes
+--FPSectionList 			: 	FPSection
+--						|	FPSection ';' FPSectionList
+
+--FormalType 				: 	baseTypes
+--						|	KW_ARRAY KW_OF baseTypes
 
 {
 parseError :: [Token] -> a
-parseError _ = error "Parse errore"
+parseError _ = error "Parse error"
 
 main = do
-	inStr <- getContents
-	let result = newl (alexScanTokens inStr)
+  inStr <- getContents
+  --print (alexScanTokens inStr)
+  let result = oLikeParse (alexScanTokens inStr)
+  --oLikeParse (alexScanTokens inStr)
+  putStrLn ("result: " ++ show(result))
+  --putStrLn("DONE")
 }

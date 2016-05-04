@@ -1,5 +1,5 @@
 {
-module Oberon where
+module OberonLexer where
 }
 
 %wrapper "basic"
@@ -60,6 +60,14 @@ tokens :-
   ">"                       { \s -> KW_TokenMajor }
   "<="                      { \s -> KW_TokenMajorEqual }
   ":="                      { \s -> KW_TokenAssignment }
+  "."                       { \s -> KW_TokenPoint }
+  ","                       { \s -> KW_TokenComa }
+  ":"                       { \s -> KW_TokenColon }
+  ";"                       { \s -> KW_TokenSemiColon }
+  "("                       { \s -> KW_TokenOpenBracket }
+  ")"                       { \s -> KW_TokenClosedBracket }
+  "["                       { \s -> KW_TokenOpenSquareBracket }
+  "]"                       { \s -> KW_TokenClosedSquareBracket }
 
   -- Variable/Constant/Procedure identifier
   $alpha [$alpha $digit \_]* { \s -> TokenVariableIdentifier s }
@@ -67,8 +75,8 @@ tokens :-
   -- Numeri e stringhe
   [1-9] $digit*             { \s -> TokenIntegerNumber (read s) }
   [1-9] $digit* "." $digit+ { \s -> TokenRealNumber (read s) }
-  $validChar                { \s -> TokenValidChar (head s) }
-  $validChar*               { \s -> TokenValidString s }
+  \" $validChar \"          { \s -> TokenValidChar (head s) }
+  \" $validChar* \"         { \s -> TokenValidString s }
 {
 
 -- The token type:
@@ -118,6 +126,14 @@ data Token =
   KW_TokenMajor                   |
   KW_TokenMajorEqual              |
   KW_TokenAssignment              |
+  KW_TokenPoint                   |
+  KW_TokenComa                    |
+  KW_TokenColon                   |
+  KW_TokenSemiColon               |
+  KW_TokenOpenBracket             |
+  KW_TokenClosedBracket           |
+  KW_TokenOpenSquareBracket       |
+  KW_TokenClosedSquareBracket     |
   TokenVariableIdentifier String  |
   TokenIntegerNumber Integer      |
   TokenRealNumber Float           |

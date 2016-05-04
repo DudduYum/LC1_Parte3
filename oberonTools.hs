@@ -87,6 +87,14 @@ addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName p
 												attributes = (attributes proc) ++ [att],
 												procedureProcedures = (procedureProcedures proc) }
 
+addProcedureToProcedure :: Procedure -> Maybe Procedure -> Procedure
+addProcedureToProcedure procDest Nothing 			= Procedure { 	procedureName = (procedureName procDest),
+																	attributes = (attributes procDest),
+																	procedureProcedures = (procedureProcedures procDest) }
+addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
+																	attributes = (attributes procDest),
+																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd] }
+
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
 
@@ -97,3 +105,6 @@ changeAttributeType attr attrType = attr { attributeType = attrType }
 
 attributesSameType :: Attribute -> Attribute -> Bool
 attributesSameType a1 a2 = (attributeType a1) == (attributeType a2)
+
+--addBodyToProcedure proc Nothing = Just proc
+--addBodyToProcedure proc body = Just (addBodyToProcedure proc (defaultAttribute {attributeName = body}))
