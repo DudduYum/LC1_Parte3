@@ -27,8 +27,6 @@ data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
 								procedureProcedures :: [Procedure] } deriving (Show)
 
--- data [Procedure]  = [Procedure]  { sProcedures :: [Procedure]  }deriving(Show)
-
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
 defaultAttribute = Attribute {	attributeName = "",
@@ -48,20 +46,16 @@ defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
 								procedureProcedures = [] }
 
--- default[Procedure]  = [Procedure]  {
---  								sProcedures = []
--- 								}
-
-createProcedure :: String -> [Procedure]  -> [Procedure]
+createProcedure :: String -> [Procedure] -> [Procedure]
 createProcedure childName stack = let
 	child = defaultProcedure { procedureName = childName}
 	in pushProcedureToStack child stack
 
 -- serve per creare lo stack di procedure (per gestire la profondita di chiamate)
-pushProcedureToStack :: Procedure -> [Procedure]  -> [Procedure]
+pushProcedureToStack :: Procedure -> [Procedure] -> [Procedure]
 pushProcedureToStack p procedures = p:procedures
 
-lookProcedureToStack :: [Procedure]  -> Maybe Procedure
+lookProcedureToStack :: [Procedure] -> Maybe Procedure
 lookProcedureToStack (x:xs) = Just x
 lookProcedureToStack []   = Nothing
 
@@ -83,8 +77,6 @@ addAttributeToProcedure :: Procedure -> Attribute -> Procedure
 addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName proc),
 												attributes = (attributes proc) ++ [att],
 												procedureProcedures = (procedureProcedures proc) }
-
-
 
 changeAttributeType :: Attribute -> AttributeType -> Attribute
 changeAttributeType attr attrType = attr { attributeType = attrType }
