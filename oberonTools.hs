@@ -8,7 +8,7 @@ data AttributeType 	= String
 					| FloatArray
 					| CharArray
 					| IntegerArray
-					deriving (Show)
+					deriving (Show, Eq)
 
 data Attribute = Attribute {	attributeName :: String,
 								attributeType :: AttributeType,
@@ -65,5 +65,13 @@ addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName p
 												attributes = (attributes proc) ++ [att],
 												procedureProcedures = (procedureProcedures proc) }
 
+
 -- lookUpForDefinition ::
 -- lookUpForDefinition atr index (x:xs) = 
+
+changeAttributeType :: Attribute -> AttributeType -> Attribute
+changeAttributeType attr attrType = attr { attributeType = attrType }
+
+attributesSameType :: Attribute -> Attribute -> Bool
+attributesSameType a1 a2 = (attributeType a1) == (attributeType a2)
+
