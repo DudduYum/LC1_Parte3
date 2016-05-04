@@ -43,7 +43,7 @@ let y = read x :: Int
 
 return y
 
-++++
+
 
 readReal :: Char -> Float
 
@@ -53,7 +53,7 @@ let y = read x :: Float
 
 return y
 
-++++
+
 
 readChar :: Char -> Char
 
@@ -61,16 +61,13 @@ x <- getLine
 
 return x
 
-++++
+
 
 readString :: String -> String
 
 x <- getLine
 
 return x
-
-
-__________
 
 
 
@@ -80,7 +77,7 @@ main = do
 	x <- readInt
 	print x
 
-++++
+
 
 writeChar :: Char -> Char
 
@@ -88,7 +85,7 @@ main = do
 	x <- readChar
 	print x
 
-++++
+
 
 writeReal :: Float -> Float
 
@@ -96,7 +93,7 @@ main = do
 	x <- readFloat
 	print x
 
-++++
+
 
 writeString :: String -> String
 
