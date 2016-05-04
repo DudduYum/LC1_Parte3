@@ -2,6 +2,8 @@
 module Main where
 import Oberon
 import OberonTools
+
+let depth = 0
 }
 
 %name newl
@@ -66,7 +68,7 @@ import OberonTools
 -- %left NEG
 
 %%
-
+procedure
 
 
 {
