@@ -61,9 +61,12 @@ createProcedure childName stack = let
 pushProcedureToStack :: Procedure -> [Procedure]  -> [Procedure]
 pushProcedureToStack p procedures = p:procedures
 
-lookProcedureToStack :: [Procedure]  -> Maybe Procedure
-lookProcedureToStack (x:xs) = Just x
-lookProcedureToStack []   = Nothing
+-- lookProcedureToStack :: [Procedure]  -> Maybe Procedure
+-- lookProcedureToStack (x:xs) = Just x
+-- lookProcedureToStack []   = Nothing
+
+-- lookProcedureToStack :: [Procedure]  -> Procedure
+-- lookProcedureToStack (x:xs) = x
 
 -- popProcedureFromStack :: [Procedure] -> [Procedure]
 -- popProcedureFromStack (x:y:xs) = let
@@ -84,6 +87,8 @@ addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName p
 												attributes = (attributes proc) ++ [att],
 												procedureProcedures = (procedureProcedures proc) }
 
+updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
+updateStackAttr (x:xs) updatedProc = updatedProc : xs
 
 
 changeAttributeType :: Attribute -> AttributeType -> Attribute
