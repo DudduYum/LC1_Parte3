@@ -35,6 +35,7 @@ tokens :-
   "WHILE"                   { \s -> KW_TokenWhile }
   "DO"                      { \s -> KW_TokenDo }
   "REPEAT"                  { \s -> KW_TokenRepeat }
+  "UNTIL"                   { \s -> KW_TokenUntil }
   "LOOP"                    { \s -> KW_TokenLoop }
   "EXIT"                    { \s -> KW_TokenExit }
   "RETURN"                  { \s -> KW_TokenReturn }
@@ -95,6 +96,7 @@ data Token =
   KW_TokenWhile                   |
   KW_TokenDo                      |
   KW_TokenRepeat                  |
+  KW_TokenUntil                   |
   KW_TokenLoop                    |
   KW_TokenExit                    |
   KW_TokenReturn                  |

@@ -4,6 +4,7 @@ import Oberon
 import OberonTools
 
 let depth = 0
+let proceduresStack = []
 }
 
 %name newl
@@ -34,6 +35,7 @@ let depth = 0
   KW_WHILE              { KW_TokenWhile }
   KW_DO                 { KW_TokenDo }
   KW_REPEAT             { KW_TokenRepeat }
+  KW_UNTIL             	{ KW_TokenUntil }
   KW_LOOP               { KW_TokenLoop }
   KW_EXIT               { KW_TokenExit }
   KW_RETURN             { KW_TokenReturn }
@@ -68,8 +70,169 @@ let depth = 0
 -- %left NEG
 
 %%
-procedure
 
+IdentifiersList 		: 	identifier
+						|	identifier ',' IdentifiersList
+
+baseTypes				:	KW_INTEGER
+						|	KW_REAL
+						|	KW_BOOLEAN
+						| 	KW_POINTER_TO
+
+type 					: 	KW_INTEGER
+						|	KW_REAL
+						|	KW_BOOLEAN
+						|	ArrayType
+						|	PointerType
+						|	ProcedureType
+
+ArrayType				: 	KW_ARRAY lenght KW_OF type
+
+lenght					:	ConstExpression
+
+PointerType				: 	KW_POINTER_TO type
+
+ProcedureType 			:	KW_PROCEDURE
+						|	KW_PROCEDURE FormalParameters
+
+VariableDeclaration		:	IdentifiersList ':' type
+
+ConstantDeclaration		: 	identifier '=' ConstExpression
+
+ConstExpression			: 	expression
+
+designator				:	identifier
+						|	identifier designatorHelper
+
+designatorHelper		: 	'.' designator
+						|	'[' ExpList ']'
+						|	'[' ExpList ']' designatorHelper
+
+ExpList					: 	expression
+						|	expression ',' ExpList
+
+expression 				: 	SimpleExpression
+						| 	SimpleExpression relation SimpleExpression
+
+relation				: 	'='
+						| 	'#'
+						| 	'<'
+						| 	'<='
+						| 	'>'
+						| 	'>='
+
+SimpleExpression		:	term
+						|	term AddOperatorList
+						|	'+' term
+						|	'-' term
+						|	'+' term AddOperatorList
+						|	'-' term AddOperatorList
+
+AddOperator				:	'+'
+						|	'-'
+						|	KW_OR
+
+AddOperatorList			:	AddOperator term
+						|	AddOperator term AddOperatorList
+
+term 					:	factor
+						|	factor MulOperatorList
+
+MulOperator 			:	'*'
+						|	'/'
+						|	KW_DIV
+						| 	KW_MOD
+						|	'&'
+
+MulOperatorList			:	MulOperator factor
+						|	MulOperator factor MulOperatorList
+
+factor	 				:	integerNum
+						|	realNum
+						|	'"' validChar '"'
+						|	'"' validString '"' 
+						|	designator
+						|	designator ActualParameters
+						|	"(" expression ")"
+						|	"~" factor
+
+ActualParameters		: 	"(" ")"
+						|	"(" ExpList ")"
+
+statement 				:	assignment
+						|	ProcedureCall
+						|	IfStatement
+						|	CaseStatement
+						| 	WhileStatement
+						|	RepeatStatement
+						|	LoopStatement
+						|	KW_EXIT
+						|	KW_RETURN
+						|	KW_RETURN expression
+
+assignment 				:	designator ':=' expression
+
+ProcedureCall 			:	designator
+						|	designator ActualParameters
+
+StatementSequence 		:	statement
+						|	statement ';' StatementSequence
+
+IfStatement 			:	KW_IF expression KW_THEN StatementSequence KW_END
+						|	KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
+						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
+						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
+
+ElseIfList 				:	KW_ELSIF expression KW_THEN StatementSequence
+						|	KW_ELSIF expression KW_THEN StatementSequence ElseIfList
+
+CaseStatement 			: 	KW_CASE expression KW_OF Case KW_END
+						|	KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
+						|	KW_CASE expression KW_OF CaseList KW_END
+						|	KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
+
+Case 					:	CaseLabelList ':' StatementSequence
+
+CaseLabelList 			:	CaseLabels
+						|	CaseLabels ',' CaseLabelList
+
+CaseLabels 				:	ConstExpression
+						|	ConstExpression '..' ConstExpression
+
+WhileStatement 			:	KW_WHILE expression KW_DO StatementSequence KW_END
+
+RepeatStatement			:	KW_REPEAT StatementSequence KW_UNTIL expression
+
+LoopStatement 			:	KW_LOOP StatementSequence KW_END
+
+ProcedureDeclaration	:	ProcedureHeading ';' ProcedureBody identifier
+
+ProcedureHeading		:	KW_PROCEDURE identifier 								{
+																						do
+																							let tempStack = createProcedure $2 proceduresStack
+																							let proceduresStack = tempStack
+																					}
+						| 	KW_PROCEDURE identifier FormalParameters
+
+ProcedureBody			: 	DeclarationSequence KW_END
+						|	DeclarationSequence KW_BEGIN StatementSequence KW_END
+
+DeclarationSequence		:	KW_CONST ConstDeclaration ';'
+						|	KW_VAR VariableDeclaration ';'
+						|	ProcedureDeclaration
+
+FormalParameters 		:	'(' ')'
+						|	'(' FPSectionList ')'
+						|	'(' FPSectionList ')' ':' type
+
+FPSection 				:	IdentifiersList ':' FormalType
+						|	KW_VAR IdentifiersList ':' FormalType
+
+FPSectionList 			: 	FPSection
+						|	FPSection ';' FPSectionList
+
+FormalType 				: 	baseTypes
+						|	KW_ARRAY KW_OF baseTypes
 
 {
 parseError :: [Token] -> a
