@@ -259,8 +259,8 @@ factor	 				:	integerNum          { $1 }
 
 {
 parseError :: [Token] -> a
-parseError _ = error "Parse error"
--- parseError st = error st
+parseError [] = error "Missing expected token"
+parseError tk = error ("Unexpected token: " ++ (show (head tk)))
 
 dStack = []
 
