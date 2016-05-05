@@ -1,16 +1,16 @@
 module OberonTools where
 
-data AttributeType 	= String
-					| Float
-					| Char
-					| Integer
-					| Boolean
-					| StringArray
-					| FloatArray
-					| CharArray
-					| IntegerArray
-					| BooleanArray
+data AttributeType 	= Simple SimpleType
+					| Array [ Int ] SimpleType
 					deriving (Show, Eq)
+
+data SimpleType = String
+	| Float
+	| Char
+	| Integer
+	| Boolean
+	deriving (Show, Eq)
+
 
 data Attribute = Attribute {	attributeName :: String,
 								attributeType :: AttributeType,
@@ -43,7 +43,9 @@ data Declaration = Declaration {	declarationType 	:: DeclarationType,
 									procedureDeclared	:: Maybe Procedure } deriving (Show)
 
 defaultAttribute = Attribute {	attributeName = "",
-								attributeType = Integer,
+								attributeType =Simple Integer,
+
+								-- attributeType = Integer,
 								stringValue = "",
 								floatValue = 0.0,
 								integerValue = 0,
@@ -112,11 +114,11 @@ addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName 
 
 addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
 addBodyToProcedure procDest []			= procDest
-addBodyToProcedure procDest declList	= do 
+addBodyToProcedure procDest declList	= do
 											let decl = head declList
 											let declType = declarationType decl
 
-											if declType == DT_Variable || declType == DT_Constant then 
+											if declType == DT_Variable || declType == DT_Constant then
 												if (attributeDeclared decl) == Nothing then
 													addBodyToProcedure procDest (tail declList)
 												else
@@ -129,6 +131,7 @@ addBodyToProcedure procDest declList	= do
 
 createVariablesDefinitionsOfType :: [String] -> AttributeType -> [Declaration]
 createVariablesDefinitionsOfType namesList t = map (\x -> defaultDeclaration { declarationType = DT_Variable, attributeDeclared = Just (defaultAttribute {attributeName = x, attributeType = t})} ) namesList
+
 
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs

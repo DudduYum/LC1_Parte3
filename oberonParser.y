@@ -72,6 +72,8 @@ import OberonTools
 
 ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
                           |   ProcedureDeclaration ';' ProcedureDeclarationList { $1:$3 }
+                          -- aggiunta temporale
+
 
 ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure $1 $3)} }
 
@@ -102,20 +104,21 @@ VariableDeclarationList : VariableDeclaration                             { $1 }
 --						|	KW_BOOLEAN
 --						| KW_POINTER_TO
 
-type 				: 	KW_INTEGER    { Integer }
-						|	  KW_REAL       { Float }
-						|	  KW_BOOLEAN    { Boolean }
-            |   KW_CHAR       { Char }
---						|	ArrayType
+type 				: 	KW_INTEGER    { Simple Integer }
+						|	  KW_REAL       { Simple Float }
+						|	  KW_BOOLEAN    { Simple Boolean }
+            |   KW_CHAR       { Simple Char }
+						-- |	 ArrayType       { $1 }
 --						|	PointerType
 --						|	ProcedureType
 
---ArrayType				:  KW_ARRAY lengthList KW_OF type
 
---lenghtList 				: 	lenght
+ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 }
+
+lenghtList 				: 	lenght                { $1:[] }
 --						|	lenght ',' lenghtList
 
---lenght					:	ConstExpression
+lenght					:	ConstExpression      { $1 }
 
 --PointerType				: 	KW_POINTER_TO type
 
@@ -124,7 +127,7 @@ type 				: 	KW_INTEGER    { Integer }
 
 --ConstantDeclaration		: 	identifier '=' ConstExpression
 
---ConstExpression			: 	expression
+ConstExpression			: 	expression     { $1 }
 
 --designator				:	identifier
 --						|	identifier designatorHelper
@@ -136,7 +139,7 @@ type 				: 	KW_INTEGER    { Integer }
 --ExpList					: 	expression
 --						|	expression ',' ExpList
 
---expression 				: 	SimpleExpression
+expression 				: 	SimpleExpression      { $1 }
 --						| 	SimpleExpression relation SimpleExpression
 
 --relation				: 	'='
@@ -146,21 +149,21 @@ type 				: 	KW_INTEGER    { Integer }
 --						| 	'>'
 --						| 	KW_MajorEqual
 
---SimpleExpression		:	term
+SimpleExpression		:	term        { $1 }
 --						|	term AddOperatorList
 --						|	'+' term
 --						|	'-' term
 --						|	'+' term AddOperatorList
 --						|	'-' term AddOperatorList
 
---AddOperator				:	'+'
+--AddOperator				:	'+'          {}
 --						|	'-'
 --						|	KW_OR
 
 --AddOperatorList			:	AddOperator term
 --						|	AddOperator term AddOperatorList
 
---term 					:	factor
+term 					:	factor        { $1 }
 --						|	factor MulOperatorList
 
 --MulOperator 			:	'*'
@@ -172,7 +175,7 @@ type 				: 	KW_INTEGER    { Integer }
 --MulOperatorList			:	MulOperator factor
 --						|	MulOperator factor MulOperatorList
 
---factor	 				:	integerNum
+factor	 				:	integerNum          { $1 }
 --						|	realNum
 --						|	'"' validChar '"'
 --						|	'"' validString '"'
