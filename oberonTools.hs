@@ -25,11 +25,11 @@ data Attribute = Attribute {	attributeName :: String,
 								charArrayValue :: [Char],
 								booleanArrayValue :: [Bool],
 								isConstant :: Bool,
-								isPassedByReference :: Bool } deriving (Show)
+								isPassedByReference :: Bool } deriving (Show, Eq)
 
 data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
-								procedureProcedures :: [Procedure] } deriving (Show)
+								procedureProcedures :: [Procedure] } deriving (Show, Eq)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 

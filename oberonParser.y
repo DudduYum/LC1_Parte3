@@ -73,7 +73,7 @@ import OberonTools
 ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
                           |   ProcedureDeclaration ';' ProcedureDeclarationList { $1:$3 }
 
-ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = (addBodyToProcedure $1 $3)} }
+ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure $1 $3)} }
 
 IdentifiersList 		: 	identifier							        { [$1] }
 						        |	  identifier ',' IdentifiersList  { $1:$3 }
