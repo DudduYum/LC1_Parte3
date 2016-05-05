@@ -138,6 +138,16 @@ updateStackAttr (x:xs) updatedProc = updatedProc : xs
 changeAttributeType :: Attribute -> AttributeType -> Attribute
 changeAttributeType attr attrType = attr { attributeType = attrType }
 
+listElementIsLessOrEqualZero :: [Integer] -> Bool
+listElementIsLessOrEqualZero [] = False
+listElementIsLessOrEqualZero ls = do
+									let elem = head ls
+
+									if elem <= 0 then
+										True
+									else
+										listElementIsLessOrEqualZero (tail ls)
+
 attributesSameType :: Attribute -> Attribute -> Bool
 attributesSameType a1 a2 = (attributeType a1) == (attributeType a2)
 

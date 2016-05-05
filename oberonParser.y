@@ -119,7 +119,14 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 						|	  KW_REAL                           { Simple Float }
 						|	  KW_BOOLEAN                        { Simple Boolean }
             |   KW_CHAR                           { Simple Char }
-						|   KW_ARRAY lenghtList KW_OF type    { Array $2 $4  }
+						|   KW_ARRAY lenghtList KW_OF type    { 
+                                                    do
+                                                      let lenList = $2
+                                                      if listElementIsLessOrEqualZero lenList then
+                                                        parseError [KW_TokenChar]
+                                                      else
+                                                        Array lenList $4
+                                                  }
 --						|	PointerType
 --						|	ProcedureType
 
@@ -159,10 +166,10 @@ expression 				: 	SimpleExpression      { $1 }
 --						| 	'>'
 --						| 	KW_MajorEqual
 
-SimpleExpression		:	term        { $1 }
+SimpleExpression		:	term        { $1  }
 --						|	term AddOperatorList
---						|	'+' term
---						|	'-' term
+						        |	'+' term    { $2  }
+						        |	'-' term    { -$2 }
 --						|	'+' term AddOperatorList
 --						|	'-' term AddOperatorList
 
@@ -201,7 +208,7 @@ factor	 				:	integerNum          { $1 }
 --						|	ProcedureCall
 --						|	IfStatement
 --						|	CaseStatement
---						| 	WhileStatement
+--						| WhileStatement
 --						|	RepeatStatement
 --						|	LoopStatement
 --						|	KW_EXIT
