@@ -18,7 +18,7 @@ data Program a =        Procedure ( Program a )
 instance Pretty a => Pretty ( Program a ) where
     pPrint ( Attribute a ) = text "VAR: " <> pPrint a
     pPrint ( Procedure p ) = vcat [ text "PROCEDURE: "
-                                    , nest 2 ( pPrint p )]
+                                    , nest 1 ( pPrint p )]
                                     
 
                
