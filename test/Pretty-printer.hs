@@ -53,7 +53,7 @@ instance Pretty a => Pretty ( Program a ) where
  "CONTINUE"                
 -}
 
-
+-- Infine si fornisce pure qualche esempio ai fini della comprensione
 
 
 
