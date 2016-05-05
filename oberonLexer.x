@@ -68,12 +68,13 @@ tokens :-
   ")"                       { \s -> KW_TokenClosedBracket }
   "["                       { \s -> KW_TokenOpenSquareBracket }
   "]"                       { \s -> KW_TokenClosedSquareBracket }
+  \"                        { \s -> KW_TokenDoubleQuotes }
 
   -- Variable/Constant/Procedure identifier
   $alpha [$alpha $digit \_]* { \s -> TokenVariableIdentifier s }
 
   -- Numeri e stringhe
-  [1-9] $digit*             { \s -> TokenIntegerNumber (read s :: Integer) }
+  [1-9] $digit*             { \s -> TokenIntegerNumber (read s) }
   [1-9] $digit* "." $digit+ { \s -> TokenRealNumber (read s) }
   \" $validChar \"          { \s -> TokenValidChar (head s) }
   \" $validChar* \"         { \s -> TokenValidString s }
@@ -134,6 +135,7 @@ data Token =
   KW_TokenClosedBracket           |
   KW_TokenOpenSquareBracket       |
   KW_TokenClosedSquareBracket     |
+  KW_TokenDoubleQuotes            |
   TokenVariableIdentifier String  |
   TokenIntegerNumber Integer      |
   TokenRealNumber Float           |

@@ -1,4 +1,3 @@
 PROCEDURE p1;
-	VAR i, j, k: ARRAY -5 OF INTEGER;
-		m, n, p: CHAR;
+	VAR i: ARRAY 100-(5*3-4*2-20) OF INTEGER;
 END p1

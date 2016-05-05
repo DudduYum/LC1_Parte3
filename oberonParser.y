@@ -62,6 +62,7 @@ import OberonTools
   ')'         					{ KW_TokenClosedBracket }
   '['         					{ KW_TokenOpenSquareBracket }
   ']'         					{ KW_TokenClosedSquareBracket }
+  '"'                   { KW_TokenDoubleQuotes }
   identifier 			      { TokenVariableIdentifier $$ }
   integerNum            { TokenIntegerNumber $$ }
   realNum 				      { TokenRealNumber $$ }
@@ -123,7 +124,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
                                                     do
                                                       let lenList = $2
                                                       if listElementIsLessOrEqualZero lenList then
-                                                        parseError [KW_TokenChar]
+                                                        parseError [KW_TokenAssignment]
                                                       else
                                                         Array lenList $4
                                                   }
@@ -132,10 +133,17 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 
 -- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
 
-lenghtList 				: 	lenght                  { [$1] }
-						      |	  lenght ',' lenghtList   { $1:$3 }
+lenghtList 				: 	lenght                  { 
+                                                do
+                                                  let val = $1
+                                                  if attributeIsOfType val (Simple Integer) then
+                                                    [(integerValue val)]
+                                                  else
+                                                    parseError [KW_TokenStar]
+                                              }
+--						      |	  lenght ',' lenghtList   { $1:$3 }
 
-lenght					:	ConstExpression      { $1 }
+lenght					:	ConstExpression     { $1 }
 
 --PointerType				: 	KW_POINTER_TO type
 
@@ -144,7 +152,7 @@ lenght					:	ConstExpression      { $1 }
 
 --ConstantDeclaration		: 	identifier '=' ConstExpression
 
-ConstExpression			: 	expression     { $1 }
+ConstExpression			: 	expression      { $1 }
 
 --designator				:	identifier
 --						|	identifier designatorHelper
@@ -166,40 +174,157 @@ expression 				: 	SimpleExpression      { $1 }
 --						| 	'>'
 --						| 	KW_MajorEqual
 
-SimpleExpression		:	term        { $1  }
---						|	term AddOperatorList
-						        |	'+' term    { $2  }
-						        |	'-' term    { -$2 }
---						|	'+' term AddOperatorList
---						|	'-' term AddOperatorList
+SimpleExpression		:	term                        { $1 }
+                    | '+' SimpleExpression        { $2 }
+                    | '-' SimpleExpression        {
+                                                    do
+                                                      let val = $2
+                                                      if attributeIsOfType val (Simple Integer) then
+                                                        defaultAttribute { attributeType = Simple Integer, integerValue = -(integerValue val) }
+                                                      else
+                                                        parseError [KW_TokenChar]
+                                                  }
+						        |	term '+' SimpleExpression   {
+                                                    do
+                                                      let t1 = $1
+                                                      let t2 = $3
 
---AddOperator				:	'+'          {}
---						|	'-'
---						|	KW_OR
+                                                      if attributesSameType t1 t2 then
+                                                        -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                        if attributeIsOfType t1 (Simple Float) then
+                                                          defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (floatValue t2) }
+                                                        else if attributeIsOfType t1 (Simple Integer) then
+                                                          defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) + (integerValue t2) }
+                                                        else if attributeIsOfType t1 (Simple String) then
+                                                          defaultAttribute { attributeType = Simple String, stringValue = (stringValue t1) ++ (stringValue t2) }
+                                                        else
+                                                          parseError [KW_TokenColon]
+                                                      else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                        defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) + (floatValue t2) }
+                                                      else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                        defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (fromIntegral (integerValue t2)) }
+                                                      else
+                                                        parseError [KW_TokenPoint]
+                                                  }
+                    | term '-' SimpleExpression   {
+                                                    do
+                                                      let t1 = $1
+                                                      let t2 = $3
 
---AddOperatorList			:	AddOperator term
---						|	AddOperator term AddOperatorList
+                                                      if attributesSameType t1 t2 then
+                                                        -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                        if attributeIsOfType t1 (Simple Float) then
+                                                          defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (floatValue t2) }
+                                                        else if attributeIsOfType t1 (Simple Integer) then
+                                                          defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) - (integerValue t2) }
+                                                        else
+                                                          parseError [KW_TokenColon]
+                                                      else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                        defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) - (floatValue t2) }
+                                                      else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                        defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (fromIntegral (integerValue t2)) }
+                                                      else
+                                                        parseError [KW_TokenPoint]
+                                                  }
+                    | term KW_OR SimpleExpression {
+                                                    do
+                                                      let t1 = $1
+                                                      let t2 = $3
 
-term 					:	factor        { $1 }
---						|	factor MulOperatorList
+                                                      if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
+                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) || (booleanValue t2) }
+                                                      else
+                                                        parseError [KW_TokenPoint]
+                                                  }
 
---MulOperator 			:	'*'
---						|	'/'
---						|	KW_DIV
---						| 	KW_MOD
---						|	'&'
+term 					:	factor                { $1 }
+						  |	factor '*' term       {
+                                        do
+                                          let t1 = $1
+                                          let t2 = $3
 
---MulOperatorList			:	MulOperator factor
---						|	MulOperator factor MulOperatorList
+                                          if attributesSameType t1 t2 then
+                                            -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                            if attributeIsOfType t1 (Simple Float) then
+                                              defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (floatValue t2) }
+                                            else if attributeIsOfType t1 (Simple Integer) then
+                                              defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) * (integerValue t2) }
+                                            else
+                                              parseError [KW_TokenColon]
+                                          else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                            defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) * (floatValue t2) }
+                                          else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                            defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (fromIntegral (integerValue t2)) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+              | factor '/' term       {
+                                        do
+                                          let t1 = $1
+                                          let t2 = $3
 
-factor	 				:	integerNum          { $1 }
---						|	realNum
---						|	'"' validChar '"'
---						|	'"' validString '"'
---						|	designator
---						|	designator ActualParameters
---						|	'(' expression ')'
---						|	'~' factor
+                                          if attributesSameType t1 t2 then
+                                            -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                            if attributeIsOfType t1 (Simple Float) then
+                                              defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (floatValue t2) }
+                                            else if attributeIsOfType t1 (Simple Integer) then
+                                              defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (fromIntegral (integerValue t2)) }
+                                            else
+                                              parseError [KW_TokenColon]
+                                          else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                            defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (floatValue t2) }
+                                          else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                            defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (fromIntegral (integerValue t2)) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+              | factor KW_DIV term    {
+                                        do
+                                          let t1 = $1
+                                          let t2 = $3
+
+                                          if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
+                                            defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `quot` (integerValue t2) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+              | factor KW_MOD term    {
+                                        do
+                                          let t1 = $1
+                                          let t2 = $3
+
+                                          if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
+                                            defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `mod` (integerValue t2) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+              | factor '&' term       {
+                                        do
+                                          let t1 = $1
+                                          let t2 = $3
+
+                                          if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
+                                            defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) && (booleanValue t2) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+
+factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = $1 } }
+						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = $1 } }
+						    |	'"' validChar '"'   { defaultAttribute { attributeType = Simple Char, charValue = $2 } }
+						    |	'"' validString '"' { defaultAttribute { attributeType = Simple String, stringValue = $2 } }
+						    |	'(' expression ')'  { $2 }
+    						|	'~' factor          {
+                                        do
+                                          let val = $2
+
+                                          if attributeType val == Simple Boolean then
+                                            defaultAttribute { attributeType = Simple Boolean, booleanValue = not (booleanValue val) }
+                                          else
+                                            parseError [KW_TokenPoint]
+                                      }
+--                | designator
+--                | designator ActualParameters
 
 --ActualParameters		: 	'(' ')'
 --						|	'(' ExpList ')'
@@ -274,7 +399,6 @@ main = do
   inStr <- getContents
   --print (alexScanTokens inStr)
   let result = oLikeParse (alexScanTokens inStr)
-  --oLikeParse (alexScanTokens inStr)
   putStrLn ("result: " ++ show(result))
   putStrLn("DONE")
 }

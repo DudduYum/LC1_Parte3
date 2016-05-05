@@ -148,8 +148,8 @@ listElementIsLessOrEqualZero ls = do
 									else
 										listElementIsLessOrEqualZero (tail ls)
 
+attributeIsOfType :: Attribute -> AttributeType -> Bool
+attributeIsOfType att typ = (attributeType att) == typ
+
 attributesSameType :: Attribute -> Attribute -> Bool
 attributesSameType a1 a2 = (attributeType a1) == (attributeType a2)
-
---addBodyToProcedure proc Nothing = Just proc
---addBodyToProcedure proc body = Just (addBodyToProcedure proc (defaultAttribute {attributeName = body}))
