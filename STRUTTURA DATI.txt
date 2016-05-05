@@ -1,6 +1,6 @@
 STRUTTURA DATI
 
-Secondo me potrebbero esserci 3 tibi base:
+Secondo me potrebbero esserci 3 tipi base:
 - Program
 - Procedure
 - Attribute
