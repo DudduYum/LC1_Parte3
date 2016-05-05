@@ -57,8 +57,8 @@ instance Pretty a => Pretty ( Program a ) where
 PROCEDURE p1;
 	    PROCEDURE p12;
 	 	       PROCEDURE p123;
-		        END p123
-     END p12;
+		       END p123
+     	    END p12;
 	    PROCEDURE p22;
 	         PROCEDURE p1234;
 	         END p1234
