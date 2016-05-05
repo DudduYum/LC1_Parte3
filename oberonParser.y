@@ -87,11 +87,27 @@ ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier {
 IdentifiersList 		: 	identifier							        { [(name $1)] }
 						        |	  identifier ',' IdentifiersList  { (name $1):$3 }
 
-VariableDeclaration : IdentifiersList ':' type          { createVariablesDefinitionsOfType $1 $3 }
+VariableDeclaration :   IdentifiersList ':' type        { createVariablesDefinitionsOfType $1 $3 }
 
-ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = (name $2) } }
---            |   KW_PROCEDURE identifier FormalParameters
+ProcedureHeading    :   KW_PROCEDURE identifier                                 { defaultProcedure { procedureName = (name $2) } }
+                    |   KW_PROCEDURE identifier FormalParameters                { addParametersToProcedure (defaultProcedure { procedureName = (name $2) }) $3 }
+                    |   KW_PROCEDURE identifier FormalParameters ':' FormalType { addParametersToProcedure (defaultProcedure { procedureName = (name $2), returnType = Just $5 }) $3 }
 
+FormalParameters    :   '(' ')'                         { [] }
+                    |   '(' FPSectionList ')'           { $2 }
+
+FPSection           :   IdentifiersList ':' FormalType          { createProcedureParametersByReferenceDefinitionsOfType $1 $3 }
+                    |   KW_VAR IdentifiersList ':' FormalType   { createProcedureParametersByValueDefinitionsOfType $2 $4 }
+
+FPSectionList       :   FPSection                       { $1 }
+                    |   FPSection ';' FPSectionList     { $1++$3 }
+
+FormalType          : KW_INTEGER        { Integer }
+                    | KW_REAL           { Float }
+                    | KW_BOOLEAN        { Boolean }
+                    | KW_CHAR           { Char }
+--                    | KW_ARRAY KW_OF baseTypes
+--                    | KW_POINTER_TO
 
 ProcedureBody     : KW_END                                          { [] }
                   | DeclarationSequenceList KW_END                  { $1 }
@@ -110,11 +126,6 @@ ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
 VariableDeclarationList : VariableDeclaration ';'                         { $1 }
                         | VariableDeclaration ';' VariableDeclarationList { $1++$3 }
 
---baseTypes				:	KW_INTEGER
---						|	KW_REAL
---						|	KW_BOOLEAN
---						| KW_POINTER_TO
-
 type 				: 	KW_INTEGER                        { Simple Integer }
 						|	  KW_REAL                           { Simple Float }
 						|	  KW_BOOLEAN                        { Simple Boolean }
@@ -130,15 +141,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 --						|	PointerType
 --						|	ProcedureType
 
-lenghtList 				: 	lenght                  {
-                                                checkIndex $1
-                                                -- do
-                                                --   let val = $1
-                                                --   if attributeIsOfType val (Simple Integer) then
-                                                --     [(integerValue val)]
-                                                --   else
-                                                --     fatalError_2 ("Invalid array size. Only integer numbers are valid array sizes")
-                                              }
+lenghtList 				: 	lenght                  { checkIndex $1 }
 						      |	  lenght ',' lenghtList   { (checkIndex $1)++$3 }
 
 lenght					:	ConstExpression     { $1 }
@@ -507,19 +510,6 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
 --RepeatStatement			:	KW_REPEAT StatementSequence KW_UNTIL expression
 
 --LoopStatement 			:	KW_LOOP StatementSequence KW_END
-
---FormalParameters 		:	'(' ')'
---						|	'(' FPSectionList ')'
---						|	'(' FPSectionList ')' ':' type
-
---FPSection 				:	IdentifiersList ':' FormalType
---						|	KW_VAR IdentifiersList ':' FormalType
-
---FPSectionList 			: 	FPSection
---						|	FPSection ';' FPSectionList
-
---FormalType 				: 	baseTypes
---						|	KW_ARRAY KW_OF baseTypes
 
 {
 

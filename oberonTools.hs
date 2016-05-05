@@ -25,11 +25,13 @@ data Attribute = Attribute {	attributeName :: String,
 								charArrayValue :: [Char],
 								booleanArrayValue :: [Bool],
 								isConstant :: Bool,
+								isParameter :: Bool,
 								isPassedByReference :: Bool } deriving (Show, Eq)
 
 data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
-								procedureProcedures :: [Procedure] } deriving (Show, Eq)
+								procedureProcedures :: [Procedure],
+								returnType :: Maybe SimpleType } deriving (Show, Eq)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
@@ -56,11 +58,13 @@ defaultAttribute = Attribute {	attributeName = "",
 								charArrayValue = [],
 								booleanArrayValue = [],
 								isConstant = False,
+								isParameter = False,
 								isPassedByReference = False }
 
 defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
-								procedureProcedures = [] }
+								procedureProcedures = [],
+								returnType = Nothing }
 
 defaultDeclaration = Declaration { 	declarationType = DT_Variable,
 									attributeDeclared = Nothing,
@@ -104,12 +108,14 @@ popProcedureFromStack (x:y:xs) = ((Procedure { procedureName = (procedureName y)
 addAttributeToProcedure :: Procedure -> Maybe Attribute -> Procedure
 addAttributeToProcedure proc (Just att) = Procedure { 	procedureName = (procedureName proc),
 														attributes = (attributes proc) ++ [att],
-														procedureProcedures = (procedureProcedures proc) }
+														procedureProcedures = (procedureProcedures proc),
+														returnType = (returnType proc) }
 
 addProcedureToProcedure :: Procedure -> Maybe Procedure -> Procedure
 addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
 																	attributes = (attributes procDest),
-																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd] }
+																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd],
+																	returnType = (returnType procDest) }
 
 addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
 addBodyToProcedure procDest []			= procDest
@@ -128,9 +134,18 @@ addBodyToProcedure procDest declList	= do
 												else
 													addBodyToProcedure (addProcedureToProcedure procDest (procedureDeclared decl)) (tail declList)
 
+addParametersToProcedure :: Procedure -> [Attribute] -> Procedure
+addParametersToProcedure procDest []		= procDest
+addParametersToProcedure procDest attribs	= addParametersToProcedure (addAttributeToProcedure procDest (Just (head attribs))) (tail attribs)
+
 createVariablesDefinitionsOfType :: [String] -> AttributeType -> [Declaration]
 createVariablesDefinitionsOfType namesList t = map (\x -> defaultDeclaration { declarationType = DT_Variable, attributeDeclared = Just (defaultAttribute {attributeName = x, attributeType = t})} ) namesList
 
+createProcedureParametersByValueDefinitionsOfType :: [String] -> SimpleType -> [Attribute]
+createProcedureParametersByValueDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = (Simple t), isParameter = True}) namesList
+
+createProcedureParametersByReferenceDefinitionsOfType :: [String] -> SimpleType -> [Attribute]
+createProcedureParametersByReferenceDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = (Simple t), isParameter = True, isPassedByReference = True}) namesList
 
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
