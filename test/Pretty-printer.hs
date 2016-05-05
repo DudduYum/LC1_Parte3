@@ -5,7 +5,7 @@
 module Pretty-printer where
 
 import Text.PrettyPrint
-import Text.PrettyPrint.HughesPJClass
+--import Text.PrettyPrint.HughesPJClass
 
 -- Qui bisognerà implementare la struttura dati utilizzata dal parser
 
