@@ -20,6 +20,7 @@ instance Pretty a => Pretty ( Program a ) where
     pPrint ( Procedure p ) = vcat [ text "PROCEDURE: "
                                     , nest 1 ( pPrint p )]
                                     
+-- nest si occupa dell'indentazione, dato il numero di volta da fare; con quello si può tenere conto di indentazioni precedenti, per esempio nel caso di funzioni/procedure annidate
 
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
  "INTEGER"        A         
