@@ -4,10 +4,12 @@ data AttributeType 	= String
 					| Float
 					| Char
 					| Integer
+					| Boolean
 					| StringArray
 					| FloatArray
 					| CharArray
 					| IntegerArray
+					| BooleanArray
 					deriving (Show, Eq)
 
 data Attribute = Attribute {	attributeName :: String,
@@ -16,10 +18,12 @@ data Attribute = Attribute {	attributeName :: String,
 								floatValue :: Float,
 								integerValue :: Integer,
 								charValue :: Char,
+								booleanValue :: Bool,
 								stringArrayValue :: [String],
 								floatArrayValue :: [Float],
 								integerArrayValue :: [Integer],
 								charArrayValue :: [Char],
+								booleanArrayValue :: [Bool],
 								isConstant :: Bool,
 								isPassedByReference :: Bool } deriving (Show)
 
@@ -29,22 +33,37 @@ data Procedure = Procedure { 	procedureName :: String,
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
+data DeclarationType 	= DT_Variable
+						| DT_Constant
+						| DT_Procedure
+						deriving (Show, Eq)
+
+data Declaration = Declaration {	declarationType 	:: DeclarationType,
+									attributeDeclared	:: Maybe Attribute,
+									procedureDeclared	:: Maybe Procedure } deriving (Show)
+
 defaultAttribute = Attribute {	attributeName = "",
 								attributeType = Integer,
 								stringValue = "",
 								floatValue = 0.0,
 								integerValue = 0,
 								charValue = ' ',
+								booleanValue = False,
 								stringArrayValue = [],
 								floatArrayValue = [],
 								integerArrayValue = [],
 								charArrayValue = [],
+								booleanArrayValue = [],
 								isConstant = False,
 								isPassedByReference = False }
 
 defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
 								procedureProcedures = [] }
+
+defaultDeclaration = Declaration { 	declarationType = DT_Variable,
+									attributeDeclared = Nothing,
+									procedureDeclared = Nothing }
 
 createProcedure :: String -> [Procedure] -> [Procedure]
 createProcedure childName stack = let
@@ -81,24 +100,38 @@ popProcedureFromStack (x:y:xs) = ((Procedure { procedureName = (procedureName y)
 		listaProcedureNew = (x : listaProcedureOld)
 		listaProcedureOld = procedureProcedures y
 
-
-addAttributeToProcedure :: Procedure -> Attribute -> Procedure
-addAttributeToProcedure proc att = Procedure { 	procedureName = (procedureName proc),
-												attributes = (attributes proc) ++ [att],
-												procedureProcedures = (procedureProcedures proc) }
+addAttributeToProcedure :: Procedure -> Maybe Attribute -> Procedure
+addAttributeToProcedure proc (Just att) = Procedure { 	procedureName = (procedureName proc),
+														attributes = (attributes proc) ++ [att],
+														procedureProcedures = (procedureProcedures proc) }
 
 addProcedureToProcedure :: Procedure -> Maybe Procedure -> Procedure
-addProcedureToProcedure procDest Nothing 			= Procedure { 	procedureName = (procedureName procDest),
-																	attributes = (attributes procDest),
-																	procedureProcedures = (procedureProcedures procDest) }
 addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
 																	attributes = (attributes procDest),
 																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd] }
 
+addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
+addBodyToProcedure procDest []			= procDest
+addBodyToProcedure procDest declList	= do 
+											let decl = head declList
+											let declType = declarationType decl
+
+											if declType == DT_Variable || declType == DT_Constant then 
+												if (attributeDeclared decl) == Nothing then
+													addBodyToProcedure procDest (tail declList)
+												else
+													addBodyToProcedure (addAttributeToProcedure procDest (attributeDeclared decl)) (tail declList)
+											else
+												if (procedureDeclared decl) == Nothing then
+													addBodyToProcedure procDest (tail declList)
+												else
+													addBodyToProcedure (addProcedureToProcedure procDest (procedureDeclared decl)) (tail declList)
+
+createVariablesDefinitionsOfType :: [String] -> AttributeType -> [Declaration]
+createVariablesDefinitionsOfType namesList t = map (\x -> defaultDeclaration { declarationType = DT_Variable, attributeDeclared = Just (defaultAttribute {attributeName = x, attributeType = t})} ) namesList
+
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
-
-
 
 changeAttributeType :: Attribute -> AttributeType -> Attribute
 changeAttributeType attr attrType = attr { attributeType = attrType }

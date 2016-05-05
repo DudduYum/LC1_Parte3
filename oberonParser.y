@@ -70,24 +70,42 @@ import OberonTools
 
 %%
 
-ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier   {
-                                                                          do
-                                                                            let newProc = $1  -- Crea la nuova procedura
-                                                                            let procBody = $3
-                                                                            addProcedureToProcedure newProc procBody
-                                                                        }
+ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
+                          |   ProcedureDeclaration ';' ProcedureDeclarationList { $1:$3 }
 
-IdentifiersList 		: 	identifier							        { putStrLn("A") }
-						        |	  identifier ',' IdentifiersList  { putStrLn("B") }
+ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = (addBodyToProcedure $1 $3)} }
+
+IdentifiersList 		: 	identifier							        { [$1] }
+						        |	  identifier ',' IdentifiersList  { $1:$3 }
+
+VariableDeclaration : IdentifiersList ':' type          { createVariablesDefinitionsOfType $1 $3 }
+
+ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
+--            |   KW_PROCEDURE identifier FormalParameters
+
+ProcedureBody     : KW_END                                      { [] }
+                  | DeclarationSequence KW_END                  { $1 }
+--            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
+
+DeclarationSequence   : KW_VAR VariableDeclarationList ';'      { $2 }
+--                      | KW_CONST ConstDeclarationList ';'       { $1 }
+                      | ProcedureDeclarationList                { $1 }
+
+--ConstDeclarationList  : ConstDeclaration                            { $1 }
+--                      | ConstDeclaration ';' ConstDeclarationList   { $1 $3 }
+
+VariableDeclarationList : VariableDeclaration                             { $1 }
+                        | VariableDeclaration ';' VariableDeclarationList { $1++$3 }
 
 --baseTypes				:	KW_INTEGER
 --						|	KW_REAL
 --						|	KW_BOOLEAN
---						| 	KW_POINTER_TO
+--						| KW_POINTER_TO
 
---type 					: 	KW_INTEGER
---						|	KW_REAL
---						|	KW_BOOLEAN
+type 				: 	KW_INTEGER    { Integer }
+						|	  KW_REAL       { Float }
+						|	  KW_BOOLEAN    { Boolean }
+            |   KW_CHAR       { Char }
 --						|	ArrayType
 --						|	PointerType
 --						|	ProcedureType
@@ -103,8 +121,6 @@ IdentifiersList 		: 	identifier							        { putStrLn("A") }
 
 --ProcedureType 			:	KW_PROCEDURE
 --						|	KW_PROCEDURE FormalParameters
-
---VariableDeclaration		:	IdentifiersList ':' type
 
 --ConstantDeclaration		: 	identifier '=' ConstExpression
 
@@ -214,21 +230,6 @@ IdentifiersList 		: 	identifier							        { putStrLn("A") }
 
 --LoopStatement 			:	KW_LOOP StatementSequence KW_END
 
-ProcedureHeading		:	KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
---						| 	KW_PROCEDURE identifier FormalParameters
-
-ProcedureBody			: KW_END                                    { Nothing }
-                  | DeclarationSequence KW_END								{ Just $1 }
---						|	DeclarationSequence KW_BEGIN StatementSequence KW_END 	{ }
-
-DeclarationSequence		:	 ProcedureDeclaration                 { $1 }
---DeclarationSequence		:	KW_CONST ConstDeclaration ';'
---						|	KW_VAR VariableDeclaration ';'
---						|	ProcedureDeclaration
-
---ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
---                          |   ProcedureDeclaration ';' ProcedureDeclarationList { $3:[$1] }
-
 --FormalParameters 		:	'(' ')'
 --						|	'(' FPSectionList ')'
 --						|	'(' FPSectionList ')' ':' type
@@ -252,5 +253,5 @@ main = do
   let result = oLikeParse (alexScanTokens inStr)
   --oLikeParse (alexScanTokens inStr)
   putStrLn ("result: " ++ show(result))
-  --putStrLn("DONE")
+  putStrLn("DONE")
 }
