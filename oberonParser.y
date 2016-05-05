@@ -120,7 +120,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 						|	  KW_REAL                           { Simple Float }
 						|	  KW_BOOLEAN                        { Simple Boolean }
             |   KW_CHAR                           { Simple Char }
-						|   KW_ARRAY lenghtList KW_OF type    { 
+						|   KW_ARRAY lenghtList KW_OF type    {
                                                     do
                                                       let lenList = $2
                                                       if listElementIsLessOrEqualZero lenList then
@@ -131,15 +131,16 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 --						|	PointerType
 --						|	ProcedureType
 
-lenghtList 				: 	lenght                  { 
-                                                do
-                                                  let val = $1
-                                                  if attributeIsOfType val (Simple Integer) then
-                                                    [(integerValue val)]
-                                                  else
-                                                    parseError [KW_TokenStar]
+lenghtList 				: 	lenght                  {
+                                                checkIndex $1
+                                                -- do
+                                                --   let val = $1
+                                                --   if attributeIsOfType val (Simple Integer) then
+                                                --     [(integerValue val)]
+                                                --   else
+                                                --     parseError [KW_TokenStar]
                                               }
---						      |	  lenght ',' lenghtList   { $1:$3 }
+						      |	  lenght ',' lenghtList   { (checkIndex $1)++$3 }
 
 lenght					:	ConstExpression     { $1 }
 
@@ -416,6 +417,7 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
                                           else
                                             parseError [KW_TokenPoint]
                                       }
+
 --                | designator
 --                | designator ActualParameters
 
@@ -486,7 +488,12 @@ parseError :: [Token] -> a
 parseError [] = error "Missing expected token"
 parseError tk = error ("Unexpected token: " ++ (show (head tk)))
 
-dStack = []
+checkIndex v = do
+  let val = v
+  if attributeIsOfType val (Simple Integer) then
+    [(integerValue val)]
+  else
+    parseError [KW_TokenStar]
 
 main = do
   inStr <- getContents
