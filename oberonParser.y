@@ -94,19 +94,19 @@ ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName
 --            |   KW_PROCEDURE identifier FormalParameters
 
 
-ProcedureBody     : KW_END                                      { [] }
+ProcedureBody     : KW_END                                          { [] }
                   | DeclarationSequenceList KW_END                  { $1 }
 --            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
 
 DeclarationSequence   : KW_VAR VariableDeclarationList       { $2 }
---                      | KW_CONST ConstDeclarationList ';'       { $1 }
-                      | ProcedureDeclarationList                { $1 }
+                      | KW_CONST ConstDeclarationList        { $2 }
+                      | ProcedureDeclarationList             { $1 }
 
 DeclarationSequenceList : DeclarationSequence                         { $1 }
                         | DeclarationSequence DeclarationSequenceList { $1++$2 }
 
---ConstDeclarationList  : ConstDeclaration                            { $1 }
---                      | ConstDeclaration ';' ConstDeclarationList   { $1 $3 }
+ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
+                      | ConstDeclaration ';' ConstDeclarationList   { $1:$3 }
 
 VariableDeclarationList : VariableDeclaration ';'                         { $1 }
                         | VariableDeclaration ';' VariableDeclarationList { $1++$3 }
@@ -131,8 +131,6 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 --						|	PointerType
 --						|	ProcedureType
 
--- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
-
 lenghtList 				: 	lenght                  { 
                                                 do
                                                   let val = $1
@@ -150,9 +148,26 @@ lenght					:	ConstExpression     { $1 }
 --ProcedureType 			:	KW_PROCEDURE
 --						|	KW_PROCEDURE FormalParameters
 
---ConstantDeclaration		: 	identifier '=' ConstExpression
+ConstDeclaration		: 	identifier '=' ConstExpression  {
+                                                          do
+                                                            let exprResult = $3
+                                                            defaultDeclaration {  declarationType = DT_Constant,
+                                                                                  attributeDeclared = Just defaultAttribute { attributeName = $1,
+                                                                                                                              attributeType = (attributeType exprResult),
+                                                                                                                              stringValue = (stringValue exprResult),
+                                                                                                                              floatValue = (floatValue exprResult),
+                                                                                                                              integerValue = (integerValue exprResult),
+                                                                                                                              charValue = (charValue exprResult),
+                                                                                                                              booleanValue = (booleanValue exprResult),
+                                                                                                                              stringArrayValue = (stringArrayValue exprResult),
+                                                                                                                              floatArrayValue = (floatArrayValue exprResult),
+                                                                                                                              integerArrayValue = (integerArrayValue exprResult),
+                                                                                                                              charArrayValue = (charArrayValue exprResult),
+                                                                                                                              booleanArrayValue = (booleanArrayValue exprResult),
+                                                                                                                              isConstant = True } }
+                                                        }
 
-ConstExpression			: 	expression      { $1 }
+ConstExpression			  : 	expression      { $1 }
 
 --designator				:	identifier
 --						|	identifier designatorHelper
@@ -311,6 +326,8 @@ term 					:	factor                { $1 }
 
 factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = $1 } }
 						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = $1 } }
+                | KW_TRUE             { defaultAttribute { attributeType = Simple Boolean, booleanValue = True } }
+                | KW_FALSE            { defaultAttribute { attributeType = Simple Boolean, booleanValue = False } }
 						    |	'"' validChar '"'   { defaultAttribute { attributeType = Simple Char, charValue = $2 } }
 						    |	'"' validString '"' { defaultAttribute { attributeType = Simple String, stringValue = $2 } }
 						    |	'(' expression ')'  { $2 }
