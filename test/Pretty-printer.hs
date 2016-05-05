@@ -21,4 +21,39 @@ instance Pretty a => Pretty ( Program a ) where
                                     , nest 1 ( pPrint p )]
                                     
 
-               
+{- con Procedure e Attribute che possono essere uno tra i seguenti:
+ "INTEGER"                 
+ "REAL"                    
+ "BOOLEAN"                 
+ "CHAR"                    
+ "SET"                     
+ "ARRAY"                   
+ "OF"                      
+ "POINTER TO"              
+ "PROCEDURE"               
+ "BEGIN"                  
+ "END"                     
+ "VAR"                    
+ "CONST"                   
+ "TRUE"                    
+ "FALSE"                   
+ "IF"                      
+ "ELSIF"                   
+ "ELSE"                    
+ "THEN"                    
+ "CASE"                    
+ "WHILE"                   
+ "DO"                      
+ "REPEAT"                  
+ "UNTIL"                   
+ "LOOP"                    
+ "EXIT"                    
+ "RETURN"                 
+ "BREAK"                   
+ "CONTINUE"                
+-}
+
+
+
+
+
