@@ -117,7 +117,6 @@ type 				: 	KW_INTEGER    { Simple Integer }
 --						|	PointerType
 --						|	ProcedureType
 
-k
 -- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
 
 lenghtList 				: 	lenght                { $1:[] }
