@@ -60,8 +60,8 @@ PROCEDURE p1;
 		       END p123
      	    END p12;
 	    PROCEDURE p22;
-	         PROCEDURE p1234;
-	         END p1234
+	               PROCEDURE p1234;
+	               END p1234
 	    END p22
 END p1
 
