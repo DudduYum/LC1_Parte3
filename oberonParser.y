@@ -47,7 +47,7 @@ import OberonTools
   '/'                   { KW_TokenForwardSlash }
   KW_DIV                { KW_TokenDiv }
   KW_MOD                { KW_TokenMod }
-  '='                   { KW_TokenEquel }
+  '='                   { KW_TokenEqual }
   '#'                   { KW_TokenDiesis }
   '<'                   { KW_TokenMinor }
   KW_MinorEqual         { KW_TokenMinorEqual }
@@ -179,15 +179,91 @@ ConstExpression			  : 	expression      { $1 }
 --ExpList					: 	expression
 --						|	expression ',' ExpList
 
-expression 				: 	SimpleExpression      { $1 }
---						| 	SimpleExpression relation SimpleExpression
+expression 		: 	SimpleExpression                              { $1 }
+						  | 	SimpleExpression relation SimpleExpression    {
+                                                                  do
+                                                                    let expRes1 = $1
+                                                                    let expRes2 = $3
+                                                                    let rel = $2
 
---relation				: 	'='
---						| 	'#'
---						| 	'<'
---						| 	KW_MinorEqual
---						| 	'>'
---						| 	KW_MajorEqual
+                                                                    if not (attributesSameType expRes1 expRes2) then
+                                                                      parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenEqual then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((charValue expRes1) == (charValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenDiesis then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((charValue expRes1) == (charValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenMinor then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) < (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) < (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) < (fromEnum (charValue expRes2))) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) < (length (stringValue expRes2))) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenMinorEqual then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) <= (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) <= (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) <= (fromEnum (charValue expRes2))) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) <= (length (stringValue expRes2))) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenMajor then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) > (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) > (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) > (fromEnum (charValue expRes2))) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) > (length (stringValue expRes2))) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else if rel == KW_TokenMajorEqual then
+                                                                      if attributeIsOfType expRes1 (Simple Float) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) >= (floatValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) >= (integerValue expRes2)) }
+                                                                      else if attributeIsOfType expRes1 (Simple Char) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) >= (fromEnum (charValue expRes2))) }
+                                                                      else if attributeIsOfType expRes1 (Simple String) then
+                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) >= (length (stringValue expRes2))) }
+                                                                      else
+                                                                        parseError [KW_TokenTilde]
+                                                                    else
+                                                                      parseError [KW_TokenTilde]
+                                                                }
+
+relation		: 	'='            { $1 }
+						| 	'#'            { $1 }
+						| 	'<'            { $1 }
+						| 	KW_MinorEqual  { $1 }
+						| 	'>'            { $1 }
+						| 	KW_MajorEqual  { $1 }
 
 SimpleExpression		:	term                        { $1 }
                     | '+' SimpleExpression        { $2 }
@@ -346,7 +422,7 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
 --ActualParameters		: 	'(' ')'
 --						|	'(' ExpList ')'
 
---statement 				:	assignment
+--statement 	:	assignment
 --						|	ProcedureCall
 --						|	IfStatement
 --						|	CaseStatement

@@ -151,5 +151,23 @@ listElementIsLessOrEqualZero ls = do
 attributeIsOfType :: Attribute -> AttributeType -> Bool
 attributeIsOfType att typ = (attributeType att) == typ
 
+stringsEqual :: String -> String -> Bool
+stringsEqual s1 s2 = do
+						let l1 = (length s1)
+						let l2 = (length s2)
+
+						if l1 < l2 || l1 > l2 then
+							False
+						else
+							stringsEqualHelper s1 s2
+
+stringsEqualHelper :: String -> String -> Bool
+stringsEqualHelper [] [] =	True
+stringsEqualHelper s1 s2 = 	do
+								if (head s1) == (head s2) then
+									stringsEqualHelper (tail s1) (tail s2)
+								else
+									False
+
 attributesSameType :: Attribute -> Attribute -> Bool
 attributesSameType a1 a2 = (attributeType a1) == (attributeType a2)

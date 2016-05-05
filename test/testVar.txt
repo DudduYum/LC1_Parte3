@@ -1,4 +1,4 @@
 PROCEDURE p1;
 	VAR i: ARRAY 100-(5*3-4*2-20) OF INTEGER;
-	CONST h = 6; a = FALSE OR TRUE;
+	CONST h = 6; a = (2 = 2) OR FALSE;
 END p1

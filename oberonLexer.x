@@ -53,7 +53,7 @@ tokens :-
   "/"                       { \s -> KW_TokenForwardSlash }
   "DIV"                     { \s -> KW_TokenDiv }
   "MOD"                     { \s -> KW_TokenMod }
-  "="                       { \s -> KW_TokenEquel }
+  "="                       { \s -> KW_TokenEqual }
   "#"                       { \s -> KW_TokenDiesis }
   "<"                       { \s -> KW_TokenMinor }
   "<="                      { \s -> KW_TokenMinorEqual }
@@ -120,7 +120,7 @@ data Token =
   KW_TokenForwardSlash            |
   KW_TokenDiv                     |
   KW_TokenMod                     |
-  KW_TokenEquel                   |
+  KW_TokenEqual                   |
   KW_TokenDiesis                  |
   KW_TokenMinor                   |
   KW_TokenMinorEqual              |
