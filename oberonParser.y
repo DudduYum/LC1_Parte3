@@ -75,7 +75,15 @@ ProcedureDeclarationList  :   ProcedureDeclaration                              
                           -- aggiunta temporale
 
 
-ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure $1 $3)} }
+ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { 
+                                                                        do
+                                                                          let newProc = $1
+                                                                          if (procedureName newProc) == $4 then
+                                                                            defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure newProc $3) }
+                                                                          else
+                                                                            parseError
+                                                                      }
+
 
 IdentifiersList 		: 	identifier							        { [$1] }
 						        |	  identifier ',' IdentifiersList  { $1:$3 }
@@ -122,8 +130,8 @@ type 				: 	KW_INTEGER    { Simple Integer }
 
 -- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
 
-lenghtList 				: 	lenght                { $1:[] }
-						|	lenght ',' lenghtList         { $1:$3 }
+lenghtList 				: 	lenght                  { $1:[] }
+						      |	  lenght ',' lenghtList   { $1:$3 }
 
 lenght					:	ConstExpression      { $1 }
 
