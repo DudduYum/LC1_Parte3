@@ -75,13 +75,13 @@ ProcedureDeclarationList  :   ProcedureDeclaration                              
                           -- aggiunta temporale
 
 
-ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier { 
+ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier {
                                                                         do
                                                                           let newProc = $1
                                                                           if (procedureName newProc) == $4 then
                                                                             defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure newProc $3) }
                                                                           else
-                                                                            parseError
+                                                                            parseError [KW_TokenChar]
                                                                       }
 
 
@@ -93,11 +93,7 @@ VariableDeclaration : IdentifiersList ':' type          { createVariablesDefinit
 ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
 --            |   KW_PROCEDURE identifier FormalParameters
 
--- non gestrische i casi come:
--- PROCEDURE p1;
---   <body>
--- END p242442;
--- ci vole una struttura tipo steche per gestire questo
+
 ProcedureBody     : KW_END                                      { [] }
                   | DeclarationSequenceList KW_END                  { $1 }
 --            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
@@ -264,6 +260,7 @@ factor	 				:	integerNum          { $1 }
 {
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
+-- parseError st = error st
 
 dStack = []
 
