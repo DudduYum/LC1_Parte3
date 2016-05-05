@@ -1,7 +1,7 @@
 module OberonTools where
 
 data AttributeType 	= Simple SimpleType
-					| Array [ Int ] SimpleType
+					| Array [ Integer ] AttributeType
 					deriving (Show, Eq)
 
 data SimpleType = String

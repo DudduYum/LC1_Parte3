@@ -1,12 +1,4 @@
 PROCEDURE p1;
-	VAR i, j, k: INTEGER;
+	VAR i, j, k: ARRAY 5 OF INTEGER;
 		m, n, p: CHAR;
-	PROCEDURE p2;
-		PROCEDURE p3;
-		END p3
-	END p2;
-	PROCEDURE p4;
-		PROCEDURE p5;
-		END p5
-	END p4
 END p1

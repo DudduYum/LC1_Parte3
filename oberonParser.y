@@ -84,7 +84,6 @@ ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier {
                                                                             parseError [KW_TokenChar]
                                                                       }
 
-
 IdentifiersList 		: 	identifier							        { [$1] }
 						        |	  identifier ',' IdentifiersList  { $1:$3 }
 
@@ -116,17 +115,17 @@ VariableDeclarationList : VariableDeclaration ';'                         { $1 }
 --						|	KW_BOOLEAN
 --						| KW_POINTER_TO
 
-type 				: 	KW_INTEGER    { Simple Integer }
-						|	  KW_REAL       { Simple Float }
-						|	  KW_BOOLEAN    { Simple Boolean }
-            |   KW_CHAR       { Simple Char }
-						-- |   KW_ARRAY lenghtList KW_OF type    { Array $2 $4  }
+type 				: 	KW_INTEGER                        { Simple Integer }
+						|	  KW_REAL                           { Simple Float }
+						|	  KW_BOOLEAN                        { Simple Boolean }
+            |   KW_CHAR                           { Simple Char }
+						|   KW_ARRAY lenghtList KW_OF type    { Array $2 $4  }
 --						|	PointerType
 --						|	ProcedureType
 
 -- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
 
-lenghtList 				: 	lenght                  { $1:[] }
+lenghtList 				: 	lenght                  { [$1] }
 						      |	  lenght ',' lenghtList   { $1:$3 }
 
 lenght					:	ConstExpression      { $1 }
