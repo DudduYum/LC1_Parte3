@@ -91,17 +91,20 @@ ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName
 -- END p242442;
 -- ci vole una struttura tipo steche per gestire questo
 ProcedureBody     : KW_END                                      { [] }
-                  | DeclarationSequence KW_END                  { $1 }
+                  | DeclarationSequenceList KW_END                  { $1 }
 --            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
 
-DeclarationSequence   : KW_VAR VariableDeclarationList ';'      { $2 }
+DeclarationSequence   : KW_VAR VariableDeclarationList       { $2 }
 --                      | KW_CONST ConstDeclarationList ';'       { $1 }
                       | ProcedureDeclarationList                { $1 }
+
+DeclarationSequenceList : DeclarationSequence                         { $1 }
+                        | DeclarationSequence DeclarationSequenceList { $1++$2 }
 
 --ConstDeclarationList  : ConstDeclaration                            { $1 }
 --                      | ConstDeclaration ';' ConstDeclarationList   { $1 $3 }
 
-VariableDeclarationList : VariableDeclaration                             { $1 }
+VariableDeclarationList : VariableDeclaration ';'                         { $1 }
                         | VariableDeclaration ';' VariableDeclarationList { $1++$3 }
 
 --baseTypes				:	KW_INTEGER

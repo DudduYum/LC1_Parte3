@@ -1,4 +1,6 @@
 PROCEDURE p1;
+	VAR i, j, k: INTEGER;
+		m, n, p: CHAR;
 	PROCEDURE p12;
 		PROCEDURE p123;
 		END p12
