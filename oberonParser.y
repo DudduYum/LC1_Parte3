@@ -85,6 +85,11 @@ VariableDeclaration : IdentifiersList ':' type          { createVariablesDefinit
 ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
 --            |   KW_PROCEDURE identifier FormalParameters
 
+-- non gestrische i casi come:
+-- PROCEDURE p1;
+--   <body>
+-- END p242442;
+-- ci vole una struttura tipo steche per gestire questo
 ProcedureBody     : KW_END                                      { [] }
                   | DeclarationSequence KW_END                  { $1 }
 --            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
@@ -108,15 +113,15 @@ type 				: 	KW_INTEGER    { Simple Integer }
 						|	  KW_REAL       { Simple Float }
 						|	  KW_BOOLEAN    { Simple Boolean }
             |   KW_CHAR       { Simple Char }
-						-- |	 ArrayType       { $1 }
+						-- |   KW_ARRAY lenghtList KW_OF type    { Array $2 $4  }
 --						|	PointerType
 --						|	ProcedureType
 
-
-ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 }
+k
+-- ArrayType				:  KW_ARRAY lenghtList KW_OF type      { Array $2 $4 } OLD
 
 lenghtList 				: 	lenght                { $1:[] }
---						|	lenght ',' lenghtList
+						|	lenght ',' lenghtList         { $1:$3 }
 
 lenght					:	ConstExpression      { $1 }
 
@@ -249,6 +254,8 @@ factor	 				:	integerNum          { $1 }
 {
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
+
+dStack = []
 
 main = do
   inStr <- getContents

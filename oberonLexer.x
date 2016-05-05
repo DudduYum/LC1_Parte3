@@ -73,7 +73,7 @@ tokens :-
   $alpha [$alpha $digit \_]* { \s -> TokenVariableIdentifier s }
 
   -- Numeri e stringhe
-  [1-9] $digit*             { \s -> TokenIntegerNumber (read s) }
+  [1-9] $digit*             { \s -> TokenIntegerNumber (read s :: Integer) }
   [1-9] $digit* "." $digit+ { \s -> TokenRealNumber (read s) }
   \" $validChar \"          { \s -> TokenValidChar (head s) }
   \" $validChar* \"         { \s -> TokenValidString s }

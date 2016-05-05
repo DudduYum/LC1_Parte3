@@ -44,7 +44,6 @@ data Declaration = Declaration {	declarationType 	:: DeclarationType,
 
 defaultAttribute = Attribute {	attributeName = "",
 								attributeType =Simple Integer,
-
 								-- attributeType = Integer,
 								stringValue = "",
 								floatValue = 0.0,
