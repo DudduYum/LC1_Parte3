@@ -5,92 +5,91 @@ import OberonTools
 }
 
 %name oLikeParse
-%tokentype { Token }
 %error { parseError }
-
+%lexer { lexwrap } { EOF }
+%monad { Alex }
+%tokentype { Token }
 %token
-  KW_INTEGER            { KW_TokenInteger }
-  KW_REAL               { KW_TokenReal }
-  KW_BOOLEAN            { KW_TokenBoolean }
-  KW_CHAR               { KW_TokenChar }
-  KW_SET                { KW_TokenSet }
-  KW_ARRAY              { KW_TokenArray }
-  KW_OF                 { KW_TokenOf }
-  KW_POINTER_TO         { KW_TokenPointerTo }
-  KW_PROCEDURE          { KW_TokenProcedure }
-  KW_BEGIN              { KW_TokenBegin }
-  KW_END                { KW_TokenEnd }
-  KW_VAR                { KW_TokenVar }
-  KW_CONST              { KW_TokenConst }
-  KW_TRUE               { KW_TokenTrue }
-  KW_FALSE              { KW_TokenFalse }
-  KW_IF                 { KW_TokenIf }
-  KW_ELSIF              { KW_TokenElsif }
-  KW_ELSE               { KW_TokenElse }
-  KW_THEN               { KW_TokenThen }
-  KW_CASE               { KW_TokenCase }
-  KW_WHILE              { KW_TokenWhile }
-  KW_DO                 { KW_TokenDo }
-  KW_REPEAT             { KW_TokenRepeat }
-  KW_UNTIL             	{ KW_TokenUntil }
-  KW_LOOP               { KW_TokenLoop }
-  KW_EXIT               { KW_TokenExit }
-  KW_RETURN             { KW_TokenReturn }
-  KW_BREAK              { KW_TokenBreak }
-  KW_CONTINUE           { KW_TokenContinue }
-  KW_OR                 { KW_TokenOr }
-  '&'                   { KW_TokenCommercialE }
-  '~'                   { KW_TokenTilde }
-  '+'                   { KW_TokenPlus }
-  '-'                   { KW_TokenMinus }
-  '*'                   { KW_TokenStar }
-  '/'                   { KW_TokenForwardSlash }
-  KW_DIV                { KW_TokenDiv }
-  KW_MOD                { KW_TokenMod }
-  '='                   { KW_TokenEqual }
-  '#'                   { KW_TokenDiesis }
-  '<'                   { KW_TokenMinor }
-  KW_MinorEqual         { KW_TokenMinorEqual }
-  '>'                   { KW_TokenMajor }
-  KW_MajorEqual         { KW_TokenMajorEqual }
-  KW_Assignment         { KW_TokenAssignment }
-  '.'					          { KW_TokenPoint }
-  ','         					{ KW_TokenComa }
-  ':'					          { KW_TokenColon }
-  ';'         					{ KW_TokenSemiColon }
-  '('         					{ KW_TokenOpenBracket }
-  ')'         					{ KW_TokenClosedBracket }
-  '['         					{ KW_TokenOpenSquareBracket }
-  ']'         					{ KW_TokenClosedSquareBracket }
-  '"'                   { KW_TokenDoubleQuotes }
-  identifier 			      { TokenVariableIdentifier $$ }
-  integerNum            { TokenIntegerNumber $$ }
-  realNum 				      { TokenRealNumber $$ }
-  validChar             { TokenValidChar $$ }
-  validString        	  { TokenValidString $$ }
+  KW_INTEGER            { KW_TokenInteger _ }
+  KW_REAL               { KW_TokenReal _ }
+  KW_BOOLEAN            { KW_TokenBoolean _ }
+  KW_CHAR               { KW_TokenChar _ }
+  KW_SET                { KW_TokenSet _ }
+  KW_ARRAY              { KW_TokenArray _ }
+  KW_OF                 { KW_TokenOf _ }
+  KW_POINTER_TO         { KW_TokenPointerTo _ }
+  KW_PROCEDURE          { KW_TokenProcedure _ }
+  KW_BEGIN              { KW_TokenBegin _ }
+  KW_END                { KW_TokenEnd _ }
+  KW_VAR                { KW_TokenVar _ }
+  KW_CONST              { KW_TokenConst _ }
+  KW_TRUE               { KW_TokenTrue _ }
+  KW_FALSE              { KW_TokenFalse _ }
+  KW_IF                 { KW_TokenIf _ }
+  KW_ELSIF              { KW_TokenElsif _ }
+  KW_ELSE               { KW_TokenElse _ }
+  KW_THEN               { KW_TokenThen _ }
+  KW_CASE               { KW_TokenCase _ }
+  KW_WHILE              { KW_TokenWhile _ }
+  KW_DO                 { KW_TokenDo _ }
+  KW_REPEAT             { KW_TokenRepeat _ }
+  KW_UNTIL             	{ KW_TokenUntil _ }
+  KW_LOOP               { KW_TokenLoop _ }
+  KW_EXIT               { KW_TokenExit _ }
+  KW_RETURN             { KW_TokenReturn _ }
+  KW_BREAK              { KW_TokenBreak _ }
+  KW_CONTINUE           { KW_TokenContinue _ }
+  KW_OR                 { KW_TokenOr _ }
+  '&'                   { KW_TokenCommercialE _ }
+  '~'                   { KW_TokenTilde _ }
+  '+'                   { KW_TokenPlus _ }
+  '-'                   { KW_TokenMinus _ }
+  '*'                   { KW_TokenStar _ }
+  '/'                   { KW_TokenForwardSlash _ }
+  KW_DIV                { KW_TokenDiv _ }
+  KW_MOD                { KW_TokenMod _ }
+  '='                   { KW_TokenEqual _ }
+  '#'                   { KW_TokenDiesis _ }
+  '<'                   { KW_TokenMinor _ }
+  KW_MinorEqual         { KW_TokenMinorEqual _ }
+  '>'                   { KW_TokenMajor _ }
+  KW_MajorEqual         { KW_TokenMajorEqual _ }
+  KW_Assignment         { KW_TokenAssignment _ }
+  '.'					          { KW_TokenPoint _ }
+  ','         					{ KW_TokenComa _ }
+  ':'					          { KW_TokenColon _ }
+  ';'         					{ KW_TokenSemiColon _ }
+  '('         					{ KW_TokenOpenBracket _ }
+  ')'         					{ KW_TokenClosedBracket _ }
+  '['         					{ KW_TokenOpenSquareBracket _ }
+  ']'         					{ KW_TokenClosedSquareBracket _ }
+  '"'                   { KW_TokenDoubleQuotes _ }
+  identifier 			      { TokenVariableIdentifier name _ }
+  integerNum            { TokenIntegerNumber intVal _ }
+  realNum 				      { TokenRealNumber fltVal _ }
+  validChar             { TokenValidChar chrVal _ }
+  validString        	  { TokenValidString strVal _ }
 
 %%
 
 ProcedureDeclarationList  :   ProcedureDeclaration                              { [$1] }
                           |   ProcedureDeclaration ';' ProcedureDeclarationList { $1:$3 }
-                          -- aggiunta temporale
-
 
 ProcedureDeclaration  : ProcedureHeading ';' ProcedureBody identifier {
                                                                         do
                                                                           let newProc = $1
-                                                                          if (procedureName newProc) == $4 then
+                                                                          if (procedureName newProc) == (name $4) then
                                                                             defaultDeclaration { declarationType = DT_Procedure, procedureDeclared = Just (addBodyToProcedure newProc $3) }
                                                                           else
-                                                                            parseError [KW_TokenChar]
+                                                                            fatalError ("END procedure name " ++ (show (name $4)) ++ " not corresponding to the initial declaration " ++ (show (procedureName newProc))) (getRow (position $4)) (getCol (position $4))
                                                                       }
 
-IdentifiersList 		: 	identifier							        { [$1] }
-						        |	  identifier ',' IdentifiersList  { $1:$3 }
+IdentifiersList 		: 	identifier							        { [(name $1)] }
+						        |	  identifier ',' IdentifiersList  { (name $1):$3 }
 
 VariableDeclaration : IdentifiersList ':' type          { createVariablesDefinitionsOfType $1 $3 }
 
-ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = $2 } }
+ProcedureHeading    : KW_PROCEDURE identifier { defaultProcedure { procedureName = (name $2) } }
 --            |   KW_PROCEDURE identifier FormalParameters
 
 
@@ -124,7 +123,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
                                                     do
                                                       let lenList = $2
                                                       if listElementIsLessOrEqualZero lenList then
-                                                        parseError [KW_TokenAssignment]
+                                                        fatalError ("Invalid array size. One or more array sizes are less than or equal to 0") (getRow (position $1)) (getCol (position $1))
                                                       else
                                                         Array lenList $4
                                                   }
@@ -138,7 +137,7 @@ lenghtList 				: 	lenght                  {
                                                 --   if attributeIsOfType val (Simple Integer) then
                                                 --     [(integerValue val)]
                                                 --   else
-                                                --     parseError [KW_TokenStar]
+                                                --     fatalError_2 ("Invalid array size. Only integer numbers are valid array sizes")
                                               }
 						      |	  lenght ',' lenghtList   { (checkIndex $1)++$3 }
 
@@ -153,7 +152,7 @@ ConstDeclaration		: 	identifier '=' ConstExpression  {
                                                           do
                                                             let exprResult = $3
                                                             defaultDeclaration {  declarationType = DT_Constant,
-                                                                                  attributeDeclared = Just defaultAttribute { attributeName = $1,
+                                                                                  attributeDeclared = Just defaultAttribute { attributeName = (name $1),
                                                                                                                               attributeType = (attributeType exprResult),
                                                                                                                               stringValue = (stringValue exprResult),
                                                                                                                               floatValue = (floatValue exprResult),
@@ -180,101 +179,140 @@ ConstExpression			  : 	expression      { $1 }
 --ExpList					: 	expression
 --						|	expression ',' ExpList
 
-expression 		: 	SimpleExpression                              { $1 }
-						  | 	SimpleExpression relation SimpleExpression    {
-                                                                  do
-                                                                    let expRes1 = $1
-                                                                    let expRes2 = $3
-                                                                    let rel = $2
+expression 		: 	SimpleExpression                                { $1 }
+						  | 	SimpleExpression '=' SimpleExpression           {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
 
-                                                                    if not (attributesSameType expRes1 expRes2) then
-                                                                      parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenEqual then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) == (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) == (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((charValue expRes1) == (charValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                       else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenDiesis then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((floatValue expRes1) == (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((integerValue expRes1) == (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((charValue expRes1) == (charValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = not (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
-                                                                      else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenMinor then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) < (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) < (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) < (fromEnum (charValue expRes2))) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) < (length (stringValue expRes2))) }
-                                                                      else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenMinorEqual then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) <= (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) <= (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) <= (fromEnum (charValue expRes2))) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) <= (length (stringValue expRes2))) }
-                                                                      else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenMajor then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) > (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) > (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) > (fromEnum (charValue expRes2))) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) > (length (stringValue expRes2))) }
-                                                                      else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else if rel == KW_TokenMajorEqual then
-                                                                      if attributeIsOfType expRes1 (Simple Float) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) >= (floatValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) >= (integerValue expRes2)) }
-                                                                      else if attributeIsOfType expRes1 (Simple Char) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) >= (fromEnum (charValue expRes2))) }
-                                                                      else if attributeIsOfType expRes1 (Simple String) then
-                                                                        defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) >= (length (stringValue expRes2))) }
-                                                                      else
-                                                                        parseError [KW_TokenTilde]
-                                                                    else
-                                                                      parseError [KW_TokenTilde]
-                                                                }
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((charValue expRes1) == (charValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
+              |   SimpleExpression '#' SimpleExpression           {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
 
-relation		: 	'='            { $1 }
-						| 	'#'            { $1 }
-						| 	'<'            { $1 }
-						| 	KW_MinorEqual  { $1 }
-						| 	'>'            { $1 }
-						| 	KW_MajorEqual  { $1 }
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                      else
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((charValue expRes1) == (charValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
+              |   SimpleExpression '<' SimpleExpression           {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
+
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                      else
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) < (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) < (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) < (fromEnum (charValue expRes2))) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) < (length (stringValue expRes2))) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
+              |   SimpleExpression KW_MinorEqual SimpleExpression {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
+
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                      else
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) <= (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) <= (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) <= (fromEnum (charValue expRes2))) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) <= (length (stringValue expRes2))) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
+              |   SimpleExpression '>' SimpleExpression           {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
+
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                      else
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) > (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) > (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) > (fromEnum (charValue expRes2))) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) > (length (stringValue expRes2))) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
+              |   SimpleExpression KW_MajorEqual SimpleExpression {
+                                                                    do
+                                                                      let expRes1 = $1
+                                                                      let expRes2 = $3
+
+                                                                      if not (attributesSameType expRes1 expRes2) then
+                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                      else
+                                                                        if attributeIsOfType expRes1 (Simple Float) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) >= (floatValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) >= (integerValue expRes2)) }
+                                                                        else if attributeIsOfType expRes1 (Simple Char) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) >= (fromEnum (charValue expRes2))) }
+                                                                        else if attributeIsOfType expRes1 (Simple String) then
+                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) >= (length (stringValue expRes2))) }
+                                                                        else
+                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                  }
 
 SimpleExpression		:	term                        { $1 }
-                    | '+' SimpleExpression        { $2 }
+                    | '+' SimpleExpression        {
+                                                    do
+                                                      let val = $2
+                                                      if (attributeIsOfType val (Simple Integer)) || (attributeIsOfType val (Simple Float)) then
+                                                        val
+                                                      else
+                                                        fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
+                                                  }
                     | '-' SimpleExpression        {
                                                     do
                                                       let val = $2
                                                       if attributeIsOfType val (Simple Integer) then
                                                         defaultAttribute { attributeType = Simple Integer, integerValue = -(integerValue val) }
+                                                      else if attributeIsOfType val (Simple Float) then
+                                                        defaultAttribute { attributeType = Simple Float, floatValue = -(floatValue val) }
                                                       else
-                                                        parseError [KW_TokenChar]
+                                                        fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
                                                   }
 						        |	term '+' SimpleExpression   {
                                                     do
@@ -290,13 +328,13 @@ SimpleExpression		:	term                        { $1 }
                                                         else if attributeIsOfType t1 (Simple String) then
                                                           defaultAttribute { attributeType = Simple String, stringValue = (stringValue t1) ++ (stringValue t2) }
                                                         else
-                                                          parseError [KW_TokenColon]
+                                                          fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                       else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
                                                         defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) + (floatValue t2) }
                                                       else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
                                                         defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (fromIntegral (integerValue t2)) }
                                                       else
-                                                        parseError [KW_TokenPoint]
+                                                        fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                   }
                     | term '-' SimpleExpression   {
                                                     do
@@ -310,13 +348,13 @@ SimpleExpression		:	term                        { $1 }
                                                         else if attributeIsOfType t1 (Simple Integer) then
                                                           defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) - (integerValue t2) }
                                                         else
-                                                          parseError [KW_TokenColon]
+                                                          fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                       else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
                                                         defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) - (floatValue t2) }
                                                       else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
                                                         defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (fromIntegral (integerValue t2)) }
                                                       else
-                                                        parseError [KW_TokenPoint]
+                                                        fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                   }
                     | term KW_OR SimpleExpression {
                                                     do
@@ -326,7 +364,7 @@ SimpleExpression		:	term                        { $1 }
                                                       if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
                                                           defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) || (booleanValue t2) }
                                                       else
-                                                        parseError [KW_TokenPoint]
+                                                        fatalError ("Invalid operation. Logic OR operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
                                                   }
 
 term 					:	factor                { $1 }
@@ -342,13 +380,13 @@ term 					:	factor                { $1 }
                                             else if attributeIsOfType t1 (Simple Integer) then
                                               defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) * (integerValue t2) }
                                             else
-                                              parseError [KW_TokenColon]
+                                              fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                           else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
                                             defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) * (floatValue t2) }
                                           else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
                                             defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (fromIntegral (integerValue t2)) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor '/' term       {
                                         do
@@ -362,13 +400,13 @@ term 					:	factor                { $1 }
                                             else if attributeIsOfType t1 (Simple Integer) then
                                               defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (fromIntegral (integerValue t2)) }
                                             else
-                                              parseError [KW_TokenColon]
+                                              fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                           else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
                                             defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (floatValue t2) }
                                           else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
                                             defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (fromIntegral (integerValue t2)) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor KW_DIV term    {
                                         do
@@ -378,7 +416,7 @@ term 					:	factor                { $1 }
                                           if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
                                             defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `quot` (integerValue t2) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Quotient operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor KW_MOD term    {
                                         do
@@ -388,7 +426,7 @@ term 					:	factor                { $1 }
                                           if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
                                             defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `mod` (integerValue t2) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Modulus operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor '&' term       {
                                         do
@@ -398,15 +436,15 @@ term 					:	factor                { $1 }
                                           if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
                                             defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) && (booleanValue t2) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Logical AND operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
                                       }
 
-factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = $1 } }
-						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = $1 } }
+factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = (intVal $1) } }
+						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = (fltVal $1) } }
                 | KW_TRUE             { defaultAttribute { attributeType = Simple Boolean, booleanValue = True } }
                 | KW_FALSE            { defaultAttribute { attributeType = Simple Boolean, booleanValue = False } }
-						    |	'"' validChar '"'   { defaultAttribute { attributeType = Simple Char, charValue = $2 } }
-						    |	'"' validString '"' { defaultAttribute { attributeType = Simple String, stringValue = $2 } }
+						    |	'"' validChar '"'   { defaultAttribute { attributeType = Simple Char, charValue = (chrVal $2) } }
+						    |	'"' validString '"' { defaultAttribute { attributeType = Simple String, stringValue = (strVal $2) } }
 						    |	'(' expression ')'  { $2 }
     						|	'~' factor          {
                                         do
@@ -415,7 +453,7 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
                                           if attributeType val == Simple Boolean then
                                             defaultAttribute { attributeType = Simple Boolean, booleanValue = not (booleanValue val) }
                                           else
-                                            parseError [KW_TokenPoint]
+                                            fatalError ("Invalid operation. Logical NOT operation is valid only with a BOOLEAN") (getRow (position $1)) (getCol (position $1))
                                       }
 
 --                | designator
@@ -484,21 +522,37 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
 --						|	KW_ARRAY KW_OF baseTypes
 
 {
-parseError :: [Token] -> a
-parseError [] = error "Missing expected token"
-parseError tk = error ("Unexpected token: " ++ (show (head tk)))
 
 checkIndex v = do
   let val = v
   if attributeIsOfType val (Simple Integer) then
     [(integerValue val)]
   else
-    parseError [KW_TokenStar]
+    fatalError_2 ("Invalid array size. Only integer numbers are valid array sizes")
+
+lexwrap :: (Token -> Alex a) -> Alex a
+lexwrap = (alexMonadScan >>=)
+
+getCol :: AlexPosn -> Int
+getCol (AlexPn _ _ c) = c
+
+getRow :: AlexPosn -> Int
+getRow (AlexPn _ b _) = b
+
+parseError :: Token -> Alex a
+parseError tk = alexError ("Error occurred at line " ++ (show (getRow (position tk))) ++ " column " ++ (show (getCol (position tk))) ++ ": invalid token")
+
+fatalError :: (Show a1, Show a) => [Char] -> a -> a1 -> t
+fatalError s l c = error ("Error at line " ++ (show l) ++ " column " ++ (show c) ++ ": " ++ s)
+
+fatalError_2 :: [Char] -> t
+fatalError_2 s = error ("Error:  " ++ s)
+
+parse :: String -> Either String [Declaration]
+parse s = runAlex s oLikeParse
 
 main = do
   inStr <- getContents
-  --print (alexScanTokens inStr)
-  let result = oLikeParse (alexScanTokens inStr)
-  putStrLn ("result: " ++ show(result))
-  putStrLn("DONE")
+  let result = parse inStr
+  putStrLn ("result: " ++ ( either show show result ))
 }
