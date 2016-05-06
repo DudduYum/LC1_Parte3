@@ -2,7 +2,7 @@
  
 -- Qualche prova per capirsi, sul pretty printer
  
-module Pretty-printer where
+module PrettyPrinter where
 
 import Text.PrettyPrint
 --import Text.PrettyPrint.HughesPJClass ( se necessaria )
