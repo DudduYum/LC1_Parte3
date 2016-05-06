@@ -1,3 +1,4 @@
 PROCEDURE p1;
-	CONST x = "ciao";
+	CONST 	x = "ciao";
+			y = 5+4-(2*x);
 END p1

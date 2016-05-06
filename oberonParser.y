@@ -142,7 +142,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
 lenghtList 				: 	lenght                  { checkIndex $1 }
 						      |	  lenght ',' lenghtList   { (checkIndex $1)++$3 }
 
-lenght					:	ConstExpression     { $1 }
+lenght	:	ConstExpression     { $1 }
 
 --PointerType				: 	KW_POINTER_TO type
 
@@ -167,8 +167,8 @@ ConstDeclaration		: 	identifier '=' ConstExpression  {
 
 ConstExpression			  : 	expression      { $1 }
 
---designator				:	identifier
---						|	identifier designatorHelper
+designator    :	  identifier                      { defaultAttribute { attributeType = Simple Name, nameValue = (name $1) } }
+--						  |	  identifier designatorHelper
 
 --designatorHelper		: 	'.' designator
 --						|	'[' ExpList ']'
@@ -180,261 +180,389 @@ ConstExpression			  : 	expression      { $1 }
 expression 		: 	SimpleExpression                                { $1 }
 						  | 	SimpleExpression '=' SimpleExpression           {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) == (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) == (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((charValue expRes1) == (charValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_eq expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((charValue expRes1) == (charValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
               |   SimpleExpression '#' SimpleExpression           {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((floatValue expRes1) == (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((integerValue expRes1) == (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((charValue expRes1) == (charValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = not (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_neq expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((floatValue expRes1) == (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((integerValue expRes1) == (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = not ((charValue expRes1) == (charValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = not (stringsEqual (stringValue expRes1) (stringValue expRes2)) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
               |   SimpleExpression '<' SimpleExpression           {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) < (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) < (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) < (fromEnum (charValue expRes2))) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) < (length (stringValue expRes2))) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_min expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) < (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) < (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) < (fromEnum (charValue expRes2))) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) < (length (stringValue expRes2))) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
               |   SimpleExpression KW_MinorEqual SimpleExpression {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) <= (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) <= (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) <= (fromEnum (charValue expRes2))) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) <= (length (stringValue expRes2))) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mineq expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) <= (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) <= (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) <= (fromEnum (charValue expRes2))) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) <= (length (stringValue expRes2))) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
               |   SimpleExpression '>' SimpleExpression           {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) > (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) > (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) > (fromEnum (charValue expRes2))) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) > (length (stringValue expRes2))) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_maj expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) > (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) > (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) > (fromEnum (charValue expRes2))) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) > (length (stringValue expRes2))) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
               |   SimpleExpression KW_MajorEqual SimpleExpression {
                                                                     do
-                                                                      let expRes1 = $1
-                                                                      let expRes2 = $3
+                                                                      let tmp1 = getOperationResult (Just $1)
+                                                                      let tmp2 = getOperationResult (Just $3)
+                                                                      
+                                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                                      else do
+                                                                              let expRes1 = getMaybeValue tmp1
+                                                                              let expRes2 = getMaybeValue tmp2
 
-                                                                      if not (attributesSameType expRes1 expRes2) then
-                                                                        fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
-                                                                      else
-                                                                        if attributeIsOfType expRes1 (Simple Float) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) >= (floatValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Integer) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) >= (integerValue expRes2)) }
-                                                                        else if attributeIsOfType expRes1 (Simple Char) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) >= (fromEnum (charValue expRes2))) }
-                                                                        else if attributeIsOfType expRes1 (Simple String) then
-                                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) >= (length (stringValue expRes2))) }
-                                                                        else
-                                                                          fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
+                                                                              if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
+                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_majeq expRes1 expRes2) }
+                                                                              else if not (attributesSameType expRes1 expRes2) then
+                                                                                fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
+                                                                              else
+                                                                                if attributeIsOfType expRes1 (Simple Float) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((floatValue expRes1) >= (floatValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Integer) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((integerValue expRes1) >= (integerValue expRes2)) }
+                                                                                else if attributeIsOfType expRes1 (Simple Char) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((fromEnum (charValue expRes1)) >= (fromEnum (charValue expRes2))) }
+                                                                                else if attributeIsOfType expRes1 (Simple String) then
+                                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = ((length (stringValue expRes1)) >= (length (stringValue expRes2))) }
+                                                                                else
+                                                                                  fatalError ("Invalid operation. Equality comparison is possible only between two FLOAT, INTEGER, CHAR or STRING") (getRow (position $2)) (getCol (position $2))
                                                                   }
 
 SimpleExpression		:	term                        { $1 }
                     | '+' SimpleExpression        {
                                                     do
-                                                      let val = $2
-                                                      if (attributeIsOfType val (Simple Integer)) || (attributeIsOfType val (Simple Float)) then
-                                                        val
-                                                      else
-                                                        fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
+                                                      let tmp1 = getOperationResult (Just $2)
+
+                                                      if tmp1 == Nothing then
+                                                        fatalError ("Invalid operation.") (getRow (position $1)) (getCol (position $1))
+                                                      else do
+                                                              let val = getMaybeValue tmp1
+
+                                                              if (attributeType val == Simple Unknown) || (attributeType val == Simple Name) then
+                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_iden_add val) }
+                                                              else if (attributeIsOfType val (Simple Integer)) || (attributeIsOfType val (Simple Float)) then
+                                                                val
+                                                              else
+                                                                fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
                                                   }
                     | '-' SimpleExpression        {
                                                     do
-                                                      let val = $2
-                                                      if attributeIsOfType val (Simple Integer) then
-                                                        defaultAttribute { attributeType = Simple Integer, integerValue = -(integerValue val) }
-                                                      else if attributeIsOfType val (Simple Float) then
-                                                        defaultAttribute { attributeType = Simple Float, floatValue = -(floatValue val) }
-                                                      else
-                                                        fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
+                                                      let tmp1 = getOperationResult (Just $2)
+
+                                                      if tmp1 == Nothing then
+                                                        fatalError ("Invalid operation.") (getRow (position $1)) (getCol (position $1))
+                                                      else do
+                                                              let val = getMaybeValue tmp1
+                                                      
+                                                              if (attributeType val == Simple Unknown) || (attributeType val == Simple Name) then
+                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_iden_sub val) }
+                                                              else if attributeIsOfType val (Simple Integer) then
+                                                                defaultAttribute { attributeType = Simple Integer, integerValue = -(integerValue val) }
+                                                              else if attributeIsOfType val (Simple Float) then
+                                                                defaultAttribute { attributeType = Simple Float, floatValue = -(floatValue val) }
+                                                              else
+                                                                fatalError ("Invalid operation. Identity operation is possible only with INTEGER or FLOAT") (getRow (position $1)) (getCol (position $1))
                                                   }
 						        |	term '+' SimpleExpression   {
                                                     do
-                                                      let t1 = $1
-                                                      let t2 = $3
+                                                      let tmp1 = getOperationResult (Just $1)
+                                                      let tmp2 = getOperationResult (Just $3)
 
-                                                      if attributesSameType t1 t2 then
-                                                        -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
-                                                        if attributeIsOfType t1 (Simple Float) then
-                                                          defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (floatValue t2) }
-                                                        else if attributeIsOfType t1 (Simple Integer) then
-                                                          defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) + (integerValue t2) }
-                                                        else if attributeIsOfType t1 (Simple String) then
-                                                          defaultAttribute { attributeType = Simple String, stringValue = (stringValue t1) ++ (stringValue t2) }
-                                                        else
-                                                          fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
-                                                      else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
-                                                        defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) + (floatValue t2) }
-                                                      else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
-                                                        defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (fromIntegral (integerValue t2)) }
-                                                      else
-                                                        fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                      else do
+                                                              let t1 = getMaybeValue tmp1
+                                                              let t2 = getMaybeValue tmp2
+
+                                                              if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_add t1 t2) }
+                                                              else if attributesSameType t1 t2 then
+                                                                -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                                if attributeIsOfType t1 (Simple Float) then
+                                                                  defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (floatValue t2) }
+                                                                else if attributeIsOfType t1 (Simple Integer) then
+                                                                  defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) + (integerValue t2) }
+                                                                else if attributeIsOfType t1 (Simple String) then
+                                                                  defaultAttribute { attributeType = Simple String, stringValue = (stringValue t1) ++ (stringValue t2) }
+                                                                else
+                                                                  fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                              else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                                defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) + (floatValue t2) }
+                                                              else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                                defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) + (fromIntegral (integerValue t2)) }
+                                                              else
+                                                                fatalError ("Invalid operation. Sum operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                   }
                     | term '-' SimpleExpression   {
                                                     do
-                                                      let t1 = $1
-                                                      let t2 = $3
+                                                      let tmp1 = getOperationResult (Just $1)
+                                                      let tmp2 = getOperationResult (Just $3)
 
-                                                      if attributesSameType t1 t2 then
-                                                        -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
-                                                        if attributeIsOfType t1 (Simple Float) then
-                                                          defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (floatValue t2) }
-                                                        else if attributeIsOfType t1 (Simple Integer) then
-                                                          defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) - (integerValue t2) }
-                                                        else
-                                                          fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
-                                                      else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
-                                                        defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) - (floatValue t2) }
-                                                      else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
-                                                        defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (fromIntegral (integerValue t2)) }
-                                                      else
-                                                        fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                      else do
+                                                              let t1 = getMaybeValue tmp1
+                                                              let t2 = getMaybeValue tmp2
+
+                                                              if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_sub t1 t2) }
+                                                              else if attributesSameType t1 t2 then
+                                                                -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                                if attributeIsOfType t1 (Simple Float) then
+                                                                  defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (floatValue t2) }
+                                                                else if attributeIsOfType t1 (Simple Integer) then
+                                                                  defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) - (integerValue t2) }
+                                                                else
+                                                                  fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                              else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                                defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) - (floatValue t2) }
+                                                              else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                                defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) - (fromIntegral (integerValue t2)) }
+                                                              else
+                                                                fatalError ("Invalid operation. Subtract operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                                   }
                     | term KW_OR SimpleExpression {
                                                     do
-                                                      let t1 = $1
-                                                      let t2 = $3
+                                                      let tmp1 = getOperationResult (Just $1)
+                                                      let tmp2 = getOperationResult (Just $3)
 
-                                                      if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
-                                                          defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) || (booleanValue t2) }
-                                                      else
-                                                        fatalError ("Invalid operation. Logic OR operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
+                                                      if tmp1 == Nothing || tmp2 == Nothing then
+                                                        fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                                      else do
+                                                              let t1 = getMaybeValue tmp1
+                                                              let t2 = getMaybeValue tmp2
+
+                                                              if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_or t1 t2) }
+                                                              else if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
+                                                                  defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) || (booleanValue t2) }
+                                                              else
+                                                                fatalError ("Invalid operation. Logic OR operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
                                                   }
 
 term 					:	factor                { $1 }
 						  |	factor '*' term       {
                                         do
-                                          let t1 = $1
-                                          let t2 = $3
+                                          let tmp1 = getOperationResult (Just $1)
+                                          let tmp2 = getOperationResult (Just $3)
 
-                                          if attributesSameType t1 t2 then
-                                            -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
-                                            if attributeIsOfType t1 (Simple Float) then
-                                              defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (floatValue t2) }
-                                            else if attributeIsOfType t1 (Simple Integer) then
-                                              defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) * (integerValue t2) }
-                                            else
-                                              fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
-                                          else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
-                                            defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) * (floatValue t2) }
-                                          else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
-                                            defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (fromIntegral (integerValue t2)) }
-                                          else
-                                            fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                          if tmp1 == Nothing || tmp2 == Nothing then
+                                            fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                          else do
+                                                  let t1 = getMaybeValue tmp1
+                                                  let t2 = getMaybeValue tmp2
+
+                                                  if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mul t1 t2) }
+                                                  else if attributesSameType t1 t2 then
+                                                    -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                    if attributeIsOfType t1 (Simple Float) then
+                                                      defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (floatValue t2) }
+                                                    else if attributeIsOfType t1 (Simple Integer) then
+                                                      defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) * (integerValue t2) }
+                                                    else
+                                                      fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                  else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                    defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) * (floatValue t2) }
+                                                  else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                    defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) * (fromIntegral (integerValue t2)) }
+                                                  else
+                                                    fatalError ("Invalid operation. Multiplication operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor '/' term       {
                                         do
-                                          let t1 = $1
-                                          let t2 = $3
+                                          let tmp1 = getOperationResult (Just $1)
+                                          let tmp2 = getOperationResult (Just $3)
 
-                                          if attributesSameType t1 t2 then
-                                            -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
-                                            if attributeIsOfType t1 (Simple Float) then
-                                              defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (floatValue t2) }
-                                            else if attributeIsOfType t1 (Simple Integer) then
-                                              defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (fromIntegral (integerValue t2)) }
-                                            else
-                                              fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
-                                          else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
-                                            defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (floatValue t2) }
-                                          else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
-                                            defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (fromIntegral (integerValue t2)) }
-                                          else
-                                            fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                          if tmp1 == Nothing || tmp2 == Nothing then
+                                            fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                          else do
+                                                  let t1 = getMaybeValue tmp1
+                                                  let t2 = getMaybeValue tmp2
+
+                                                  if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_div t1 t2) }
+                                                  else if attributesSameType t1 t2 then
+                                                    -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
+                                                    if attributeIsOfType t1 (Simple Float) then
+                                                      defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (floatValue t2) }
+                                                    else if attributeIsOfType t1 (Simple Integer) then
+                                                      defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (fromIntegral (integerValue t2)) }
+                                                    else
+                                                      fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
+                                                  else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Float) then
+                                                    defaultAttribute { attributeType = Simple Float, floatValue = (fromIntegral (integerValue t1)) / (floatValue t2) }
+                                                  else if (attributeType t1 == Simple Float) && (attributeType t2 == Simple Integer) then
+                                                    defaultAttribute { attributeType = Simple Float, floatValue = (floatValue t1) / (fromIntegral (integerValue t2)) }
+                                                  else
+                                                    fatalError ("Invalid operation. Division operation is valid only between INTEGER-INTEGER, FLOAT-FLOAT, INTEGER-FLOAT or FLOAT-INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor KW_DIV term    {
                                         do
-                                          let t1 = $1
-                                          let t2 = $3
+                                          let tmp1 = getOperationResult (Just $1)
+                                          let tmp2 = getOperationResult (Just $3)
 
-                                          if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
-                                            defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `quot` (integerValue t2) }
-                                          else
-                                            fatalError ("Invalid operation. Quotient operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
+                                          if tmp1 == Nothing || tmp2 == Nothing then
+                                            fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                          else do
+                                                  let t1 = getMaybeValue tmp1
+                                                  let t2 = getMaybeValue tmp2
+
+                                                  if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_quot t1 t2) }
+                                                  else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
+                                                    defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `quot` (integerValue t2) }
+                                                  else
+                                                    fatalError ("Invalid operation. Quotient operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor KW_MOD term    {
                                         do
-                                          let t1 = $1
-                                          let t2 = $3
+                                          let tmp1 = getOperationResult (Just $1)
+                                          let tmp2 = getOperationResult (Just $3)
 
-                                          if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
-                                            defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `mod` (integerValue t2) }
-                                          else
-                                            fatalError ("Invalid operation. Modulus operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
+                                          if tmp1 == Nothing || tmp2 == Nothing then
+                                            fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                          else do
+                                                  let t1 = getMaybeValue tmp1
+                                                  let t2 = getMaybeValue tmp2
+
+                                                  if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mod t1 t2) }
+                                                  else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
+                                                    defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `mod` (integerValue t2) }
+                                                  else
+                                                    fatalError ("Invalid operation. Modulus operation is valid only between two INTEGER") (getRow (position $2)) (getCol (position $2))
                                       }
               | factor '&' term       {
                                         do
-                                          let t1 = $1
-                                          let t2 = $3
+                                          let tmp1 = getOperationResult (Just $1)
+                                          let tmp2 = getOperationResult (Just $3)
 
-                                          if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
-                                            defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) && (booleanValue t2) }
-                                          else
-                                            fatalError ("Invalid operation. Logical AND operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
+                                          if tmp1 == Nothing || tmp2 == Nothing then
+                                            fatalError ("Invalid operation.") (getRow (position $2)) (getCol (position $2))
+                                          else do
+                                                  let t1 = getMaybeValue tmp1
+                                                  let t2 = getMaybeValue tmp2
+
+                                                  if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
+                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_and t1 t2) }
+                                                  else if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
+                                                    defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) && (booleanValue t2) }
+                                                  else
+                                                    fatalError ("Invalid operation. Logical AND operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
                                       }
 
 factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = (intVal $1) } }
@@ -453,7 +581,7 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
                                           else
                                             fatalError ("Invalid operation. Logical NOT operation is valid only with a BOOLEAN") (getRow (position $1)) (getCol (position $1))
                                       }
---                | designator
+                | designator          { $1 }
 --                | designator ActualParameters
 
 --ActualParameters		: 	'(' ')'

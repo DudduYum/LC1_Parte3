@@ -10,11 +10,38 @@ data SimpleType = String
 	| Char
 	| Integer
 	| Boolean
+	| Name
+	| Unknown
+	| OperationResult
 	deriving (Show, Eq)
 
+data BasicOperation = OP_add Attribute Attribute
+					| OP_sub Attribute Attribute
+					| OP_iden_add Attribute
+					| OP_iden_sub Attribute
+					| OP_div Attribute Attribute
+					| OP_mul Attribute Attribute
+					| OP_quot Attribute Attribute
+					| OP_mod Attribute Attribute
+					| OP_and Attribute Attribute
+					| OP_or Attribute Attribute
+					| OP_min Attribute Attribute
+					| OP_mineq Attribute Attribute
+					| OP_maj Attribute Attribute
+					| OP_majeq Attribute Attribute
+					| OP_eq Attribute Attribute
+					| OP_neq Attribute Attribute
+					deriving (Show, Eq)
 
-data Attribute = Attribute {	attributeName :: String,
-								attributeType :: AttributeType,
+data Operation 	= OP_Assignment Attribute Attribute
+--				| OP_ProcedureCall Procedure [Attribute]
+--				| OP_If Attribute [Operation]
+				deriving (Show, Eq)
+
+data Attribute = Attribute {	attributeType :: AttributeType,
+								nameValue :: String,	-- Usato dalla regola di produzione di 'designator' per indicare il nome di un varibile, costante o procedure
+								attributeName :: String,
+								operationResultValue :: Maybe Attribute,
 								stringValue :: String,
 								floatValue :: Float,
 								integerValue :: Integer,
@@ -25,14 +52,17 @@ data Attribute = Attribute {	attributeName :: String,
 								integerArrayValue :: [Integer],
 								charArrayValue :: [Char],
 								booleanArrayValue :: [Bool],
+								basicOperation :: Maybe BasicOperation,
+								isBasicOperationResult :: Bool,
 								isConstant :: Bool,
 								isParameter :: Bool,
 								isPassedByReference :: Bool } deriving (Show, Eq)
 
-data Procedure = Procedure { 	procedureName :: String,
-								attributes :: [Attribute],
+data Procedure = Procedure { 	procedureName 		:: String,
+								attributes 			:: [Attribute],
 								procedureProcedures :: [Procedure],
-								returnType :: Maybe AttributeType } deriving (Show, Eq)
+								procedureBody 		:: [Operation],
+								returnType 			:: Maybe AttributeType } deriving (Show, Eq)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
@@ -46,8 +76,9 @@ data Declaration = Declaration {	declarationType 	:: DeclarationType,
 									procedureDeclared	:: Maybe Procedure } deriving (Show)
 
 defaultAttribute = Attribute {	attributeName = "",
-								attributeType =Simple Integer,
-								-- attributeType = Integer,
+								attributeType = Simple Integer,
+								nameValue = "",
+								operationResultValue = Nothing,
 								stringValue = "",
 								floatValue = 0.0,
 								integerValue = 0,
@@ -58,6 +89,8 @@ defaultAttribute = Attribute {	attributeName = "",
 								integerArrayValue = [],
 								charArrayValue = [],
 								booleanArrayValue = [],
+								basicOperation = Nothing,
+								isBasicOperationResult = False,
 								isConstant = False,
 								isParameter = False,
 								isPassedByReference = False }
@@ -65,57 +98,25 @@ defaultAttribute = Attribute {	attributeName = "",
 defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
 								procedureProcedures = [],
+								procedureBody = [],
 								returnType = Nothing }
 
 defaultDeclaration = Declaration { 	declarationType = DT_Variable,
 									attributeDeclared = Nothing,
 									procedureDeclared = Nothing }
 
-createProcedure :: String -> [Procedure] -> [Procedure]
-createProcedure childName stack = let
-	child = defaultProcedure { procedureName = childName}
-	in pushProcedureToStack child stack
-
--- serve per creare lo stack di procedure (per gestire la profondita di chiamate)
-pushProcedureToStack :: Procedure -> [Procedure] -> [Procedure]
-pushProcedureToStack p procedures = p:procedures
-
-
--- lookProcedureToStack :: [Procedure]  -> Maybe Procedure
--- lookProcedureToStack (x:xs) = Just x
--- lookProcedureToStack []   = Nothing
-
--- lookProcedureToStack :: [Procedure]  -> Procedure
--- lookProcedureToStack (x:xs) = x
-
-lookProcedureToStack :: [Procedure] -> Maybe Procedure
-lookProcedureToStack (x:xs) = Just x
-lookProcedureToStack []   = Nothing
-
-
--- popProcedureFromStack :: [Procedure] -> [Procedure]
--- popProcedureFromStack (x:y:xs) = let
--- 					listaProcedureOld = procedureProcedures y
--- 					in let
--- 						listaProcedureNew = (x : listaProcedureOld)
--- 							in ((Procedure { procedureName = (procedureName y) , attributes = (attributes y) , procedureProcedures = listaProcedureNew}) : xs)
-
-popProcedureFromStack :: [Procedure] -> [Procedure]
-popProcedureFromStack (x:y:xs) = ((Procedure { procedureName = (procedureName y) , attributes = (attributes y) , procedureProcedures = listaProcedureNew}) : xs)
-	where
-		listaProcedureNew = (x : listaProcedureOld)
-		listaProcedureOld = procedureProcedures y
-
 addAttributeToProcedure :: Procedure -> Maybe Attribute -> Procedure
 addAttributeToProcedure proc (Just att) = Procedure { 	procedureName = (procedureName proc),
 														attributes = (attributes proc) ++ [att],
 														procedureProcedures = (procedureProcedures proc),
+														procedureBody = (procedureBody proc),
 														returnType = (returnType proc) }
 
 addProcedureToProcedure :: Procedure -> Maybe Procedure -> Procedure
 addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
 																	attributes = (attributes procDest),
 																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd],
+																	procedureBody = (procedureBody procToAdd),
 																	returnType = (returnType procDest) }
 
 addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
@@ -151,6 +152,56 @@ createProcedureParametersByReferenceDefinitionsOfType namesList t = map (\x -> d
 createMultidimensionalArrayOfType :: [Integer] -> AttributeType -> AttributeType
 createMultidimensionalArrayOfType [x] typ = Array x typ
 createMultidimensionalArrayOfType lst typ = Array (head lst) (createMultidimensionalArrayOfType (tail lst) typ)
+
+getOperationResult :: Maybe Attribute -> Maybe Attribute
+getOperationResult Nothing 		= 	Nothing
+getOperationResult (Just att) 	= 	let attType = attributeType att
+									in
+										if attType == Simple OperationResult then
+											getOperationResult (operationResultValue att)
+										else if attType == Simple Integer then
+											Just defaultAttribute { attributeType = attType, integerValue = (integerValue att) }
+										else if attType == Simple Float then
+											Just defaultAttribute { attributeType = attType, floatValue = (floatValue att) }
+										else if attType == Simple Char then
+											Just defaultAttribute { attributeType = attType, charValue = (charValue att) }
+										else if attType == Simple String then
+											Just defaultAttribute { attributeType = attType, stringValue = (stringValue att) }
+										else if attType == Simple Boolean then
+											Just defaultAttribute { attributeType = attType, booleanValue = (booleanValue att) }
+										else if attType == Simple Name || attType == Simple Unknown then
+											Just att
+										else 
+											do
+												let arrType = getMaybeValue (getArrayType attType)
+
+												if arrType == Simple Integer then
+													Just defaultAttribute { attributeType = attType, integerArrayValue = (integerArrayValue att) }
+												else if arrType == Simple Float then
+													Just defaultAttribute { attributeType = attType, floatArrayValue = (floatArrayValue att) }
+												else if arrType == Simple Char then
+													Just defaultAttribute { attributeType = attType, charArrayValue = (charArrayValue att) }
+												else if arrType == Simple String then
+													Just defaultAttribute { attributeType = attType, stringArrayValue = (stringArrayValue att) }
+												else if arrType == Simple Boolean then
+													Just defaultAttribute { attributeType = attType, booleanArrayValue = (booleanArrayValue att) }
+												else
+													Nothing
+
+getArraySize :: AttributeType -> Integer
+getArraySize (Array a _) = a
+getArraySize _ = 0
+
+getArrayType :: AttributeType -> Maybe AttributeType
+getArrayType (Array _ b) = Just b
+getArrayType (Simple _) = Nothing
+getArrayType (UnsizedArray a) = Just a
+
+getMaybeValue :: Maybe a -> a
+getMaybeValue (Just v) = v
+
+isSameType :: AttributeType -> AttributeType -> Bool
+isSameType a b = a == b
 
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
