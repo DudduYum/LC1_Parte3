@@ -108,9 +108,9 @@ FormalType          : KW_INTEGER                  { Simple Integer }
                     | KW_ARRAY KW_OF FormalType   { UnsizedArray $3 }
 --                    | KW_POINTER_TO
 
-ProcedureBody     : KW_END                                          { [] }
-                  | DeclarationSequenceList KW_END                  { $1 }
---            | DeclarationSequence KW_BEGIN StatementSequence KW_END   { }
+ProcedureBody     : KW_END                                                    { [] }
+                  | DeclarationSequenceList KW_END                            { $1 }
+                  | DeclarationSequenceList KW_BEGIN StatementSequence KW_END { $1++$3 }
 
 DeclarationSequence   : KW_VAR VariableDeclarationList       { $2 }
                       | KW_CONST ConstDeclarationList        { $2 }
@@ -118,6 +118,20 @@ DeclarationSequence   : KW_VAR VariableDeclarationList       { $2 }
 
 DeclarationSequenceList : DeclarationSequence                         { $1 }
                         | DeclarationSequence DeclarationSequenceList { $1++$2 }
+
+StatementSequence   : statement ';'                     { [$1] }
+                    | statement ';' StatementSequence   { $1:$3 }
+
+statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
+--            | ProcedureCall
+--            | IfStatement
+--            | CaseStatement
+--            | WhileStatement
+--            | RepeatStatement
+--            | LoopStatement
+--            | KW_EXIT
+--            | KW_RETURN
+--            | KW_RETURN expression
 
 ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
                       | ConstDeclaration ';' ConstDeclarationList   { $1:$3 }
@@ -587,24 +601,8 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
 --ActualParameters		: 	'(' ')'
 --						|	'(' ExpList ')'
 
---statement 	:	assignment
---						|	ProcedureCall
---						|	IfStatement
---						|	CaseStatement
---						| WhileStatement
---						|	RepeatStatement
---						|	LoopStatement
---						|	KW_EXIT
---						|	KW_RETURN
---						|	KW_RETURN expression
-
---assignment 				:	designator KW_Assignment expression
-
 --ProcedureCall 			:	designator
 --						|	designator ActualParameters
-
---StatementSequence 		:	statement
---						|	statement ';' StatementSequence
 
 --IfStatement 			:	KW_IF expression KW_THEN StatementSequence KW_END
 --						|	KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END

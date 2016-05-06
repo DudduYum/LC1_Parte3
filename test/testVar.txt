@@ -1,4 +1,6 @@
 PROCEDURE p1;
 	CONST 	x = "ciao";
 			y = 5+4-(2*x);
+BEGIN
+	x := 5;
 END p1

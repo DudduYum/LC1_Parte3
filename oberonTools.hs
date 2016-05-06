@@ -3,6 +3,7 @@ module OberonTools where
 data AttributeType 	= Simple SimpleType
 					| UnsizedArray AttributeType
 					| Array Integer AttributeType
+--					| Pointer AttributeType
 					deriving (Show, Eq)
 
 data SimpleType = String
@@ -61,7 +62,7 @@ data Attribute = Attribute {	attributeType :: AttributeType,
 data Procedure = Procedure { 	procedureName 		:: String,
 								attributes 			:: [Attribute],
 								procedureProcedures :: [Procedure],
-								procedureBody 		:: [Operation],
+								procedureOperations :: [Operation],
 								returnType 			:: Maybe AttributeType } deriving (Show, Eq)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
@@ -69,11 +70,13 @@ data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 data DeclarationType 	= DT_Variable
 						| DT_Constant
 						| DT_Procedure
+						| DT_Operation
 						deriving (Show, Eq)
 
 data Declaration = Declaration {	declarationType 	:: DeclarationType,
 									attributeDeclared	:: Maybe Attribute,
-									procedureDeclared	:: Maybe Procedure } deriving (Show)
+									procedureDeclared	:: Maybe Procedure,
+									operationDeclared 	:: Maybe Operation } deriving (Show)
 
 defaultAttribute = Attribute {	attributeName = "",
 								attributeType = Simple Integer,
@@ -98,25 +101,33 @@ defaultAttribute = Attribute {	attributeName = "",
 defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],
 								procedureProcedures = [],
-								procedureBody = [],
+								procedureOperations = [],
 								returnType = Nothing }
 
 defaultDeclaration = Declaration { 	declarationType = DT_Variable,
 									attributeDeclared = Nothing,
-									procedureDeclared = Nothing }
+									procedureDeclared = Nothing,
+									operationDeclared = Nothing }
 
 addAttributeToProcedure :: Procedure -> Maybe Attribute -> Procedure
-addAttributeToProcedure proc (Just att) = Procedure { 	procedureName = (procedureName proc),
-														attributes = (attributes proc) ++ [att],
-														procedureProcedures = (procedureProcedures proc),
-														procedureBody = (procedureBody proc),
-														returnType = (returnType proc) }
+addAttributeToProcedure procDest (Just attToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
+																	attributes = (attributes procDest) ++ [attToAdd],
+																	procedureProcedures = (procedureProcedures procDest),
+																	procedureOperations = (procedureOperations procDest),
+																	returnType = (returnType procDest) }
 
 addProcedureToProcedure :: Procedure -> Maybe Procedure -> Procedure
 addProcedureToProcedure procDest (Just procToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
 																	attributes = (attributes procDest),
 																	procedureProcedures = (procedureProcedures procDest) ++ [procToAdd],
-																	procedureBody = (procedureBody procToAdd),
+																	procedureOperations = (procedureOperations procDest),
+																	returnType = (returnType procDest) }
+
+addOperationToProcedure :: Procedure -> Maybe Operation -> Procedure
+addOperationToProcedure procDest (Just operToAdd) 	= Procedure { 	procedureName = (procedureName procDest),
+																	attributes = (attributes procDest),
+																	procedureProcedures = (procedureProcedures procDest),
+																	procedureOperations = (procedureOperations procDest) ++ [operToAdd],
 																	returnType = (returnType procDest) }
 
 addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
@@ -130,6 +141,11 @@ addBodyToProcedure procDest declList	= do
 													addBodyToProcedure procDest (tail declList)
 												else
 													addBodyToProcedure (addAttributeToProcedure procDest (attributeDeclared decl)) (tail declList)
+											else if declType == DT_Operation then
+												if (operationDeclared decl) == Nothing then
+													addBodyToProcedure procDest (tail declList)
+												else
+													addBodyToProcedure (addOperationToProcedure procDest (operationDeclared decl)) (tail declList)
 											else
 												if (procedureDeclared decl) == Nothing then
 													addBodyToProcedure procDest (tail declList)
