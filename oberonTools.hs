@@ -13,7 +13,7 @@ data SimpleType = String
 	| Boolean
 	| Name
 	| Unknown 				-- Se un attributo e' di tipo Unknown significa che per calcolarlo e' necessario utilizzare una variabile, o una costante, e non si sa ancora di che tipo e'
-	| OperationResult
+--	| OperationResult
 	deriving (Show, Eq)
 
 data BasicOperation = OP_add Attribute Attribute
@@ -198,7 +198,8 @@ getOperationResult :: Maybe Attribute -> Maybe Attribute
 getOperationResult Nothing 		= 	Nothing
 getOperationResult (Just att) 	= 	let attType = attributeType att
 									in
-										if attType == Simple OperationResult then
+										--if attType == Simple OperationResult then
+										if attType == Simple Unknown then
 											getOperationResult (operationResultValue att)
 										else if attType == Simple Integer then
 											Just defaultAttribute { attributeType = attType, integerValue = (integerValue att) }
@@ -210,7 +211,7 @@ getOperationResult (Just att) 	= 	let attType = attributeType att
 											Just defaultAttribute { attributeType = attType, stringValue = (stringValue att) }
 										else if attType == Simple Boolean then
 											Just defaultAttribute { attributeType = attType, booleanValue = (booleanValue att) }
-										else if attType == Simple Name || attType == Simple Unknown then
+										else if attType == Simple Name then-- || attType == Simple Unknown then
 											Just att
 										else 
 											do
