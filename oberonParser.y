@@ -102,11 +102,11 @@ FPSection           :   IdentifiersList ':' FormalType          { createProcedur
 FPSectionList       :   FPSection                       { $1 }
                     |   FPSection ';' FPSectionList     { $1++$3 }
 
-FormalType          : KW_INTEGER        { Integer }
-                    | KW_REAL           { Float }
-                    | KW_BOOLEAN        { Boolean }
-                    | KW_CHAR           { Char }
---                    | KW_ARRAY KW_OF baseTypes
+FormalType          : KW_INTEGER                  { Simple Integer }
+                    | KW_REAL                     { Simple Float }
+                    | KW_BOOLEAN                  { Simple Boolean }
+                    | KW_CHAR                     { Simple Char }
+                    | KW_ARRAY KW_OF FormalType   { UnsizedArray $3 }
 --                    | KW_POINTER_TO
 
 ProcedureBody     : KW_END                                          { [] }

@@ -1,6 +1,7 @@
 module OberonTools where
 
 data AttributeType 	= Simple SimpleType
+					| UnsizedArray AttributeType
 					| Array [ Integer ] AttributeType
 					deriving (Show, Eq)
 
@@ -31,7 +32,7 @@ data Attribute = Attribute {	attributeName :: String,
 data Procedure = Procedure { 	procedureName :: String,
 								attributes :: [Attribute],
 								procedureProcedures :: [Procedure],
-								returnType :: Maybe SimpleType } deriving (Show, Eq)
+								returnType :: Maybe AttributeType } deriving (Show, Eq)
 
 data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
@@ -141,11 +142,11 @@ addParametersToProcedure procDest attribs	= addParametersToProcedure (addAttribu
 createVariablesDefinitionsOfType :: [String] -> AttributeType -> [Declaration]
 createVariablesDefinitionsOfType namesList t = map (\x -> defaultDeclaration { declarationType = DT_Variable, attributeDeclared = Just (defaultAttribute {attributeName = x, attributeType = t})} ) namesList
 
-createProcedureParametersByValueDefinitionsOfType :: [String] -> SimpleType -> [Attribute]
-createProcedureParametersByValueDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = (Simple t), isParameter = True}) namesList
+createProcedureParametersByValueDefinitionsOfType :: [String] -> AttributeType -> [Attribute]
+createProcedureParametersByValueDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = t, isParameter = True}) namesList
 
-createProcedureParametersByReferenceDefinitionsOfType :: [String] -> SimpleType -> [Attribute]
-createProcedureParametersByReferenceDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = (Simple t), isParameter = True, isPassedByReference = True}) namesList
+createProcedureParametersByReferenceDefinitionsOfType :: [String] -> AttributeType -> [Attribute]
+createProcedureParametersByReferenceDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = t, isParameter = True, isPassedByReference = True}) namesList
 
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
