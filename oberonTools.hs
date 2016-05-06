@@ -38,7 +38,8 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_ProcedureCall Attribute [Attribute]
 				| OP_Exit
 				| OP_Return (Maybe Attribute)
---				| OP_If Attribute [Operation]
+				| OP_If Attribute [Operation]
+				| OP_If_Else Attribute [Operation] [Operation]
 				deriving (Show, Eq)
 
 data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tipo di attributo (float, integer, ecc)
@@ -132,6 +133,20 @@ addOperationToProcedure procDest (Just operToAdd) 	= Procedure { 	procedureName 
 																	procedureProcedures = (procedureProcedures procDest),
 																	procedureOperations = (procedureOperations procDest) ++ [operToAdd],
 																	returnType = (returnType procDest) }
+
+declarationListToOperationList :: [Declaration] -> [Operation]
+declarationListToOperationList [] = []
+declarationListToOperationList declList = do
+											let decl = head declList
+											let declType = declarationType decl
+											
+											if declType == DT_Operation then
+												if (operationDeclared decl) == Nothing then
+													[]++(declarationListToOperationList (tail declList))
+												else
+													(getMaybeValue (operationDeclared decl)):(declarationListToOperationList (tail declList))
+											else
+												[]++(declarationListToOperationList (tail declList))
 
 addBodyToProcedure :: Procedure -> [Declaration] -> Procedure
 addBodyToProcedure procDest []			= procDest

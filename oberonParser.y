@@ -124,7 +124,7 @@ StatementSequence   : statement ';'                     { [$1] }
 
 statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
             |   ProcedureCall                           { $1 }
---            | IfStatement
+            |   IfStatement                             { $1 }
 --            | CaseStatement
 --            | WhileStatement
 --            | RepeatStatement
@@ -139,12 +139,12 @@ ProcedureCall : designator                      { defaultDeclaration { declarati
 ActualParameters  : '(' ')'           { [] }
                   | '(' ExpList ')'   { $2 }
 
---IfStatement       : KW_IF expression KW_THEN StatementSequence KW_END
---            | KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
+IfStatement : KW_IF expression KW_THEN StatementSequence KW_END                                       { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_If $2 (declarationListToOperationList $4) ) } }
+            | KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END             { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_If_Else $2 (declarationListToOperationList $4) (declarationListToOperationList $6) ) } }
 --            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
 --            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
 
---ElseIfList        : KW_ELSIF expression KW_THEN StatementSequence
+--ElseIfList  : KW_ELSIF expression KW_THEN StatementSequence
 --            | KW_ELSIF expression KW_THEN StatementSequence ElseIfList
 
 --CaseStatement       :   KW_CASE expression KW_OF Case KW_END

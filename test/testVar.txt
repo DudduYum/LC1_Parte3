@@ -7,4 +7,9 @@ BEGIN
 	EXIT;
 	RETURN;
 	RETURN 5;
+	IF 5 = 5 THEN
+		f := 5;
+	ELSE
+		g := "c";
+	END;
 END p1
