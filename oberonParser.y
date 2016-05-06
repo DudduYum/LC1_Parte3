@@ -136,7 +136,7 @@ type 				: 	KW_INTEGER                        { Simple Integer }
                                                       if listElementIsLessOrEqualZero lenList then
                                                         fatalError ("Invalid array size. One or more array sizes are less than or equal to 0") (getRow (position $1)) (getCol (position $1))
                                                       else
-                                                        Array lenList $4
+                                                        createMultidimensionalArrayOfType lenList $4
                                                   }
 --						|	PointerType
 --						|	ProcedureType

@@ -2,7 +2,7 @@ module OberonTools where
 
 data AttributeType 	= Simple SimpleType
 					| UnsizedArray AttributeType
-					| Array [ Integer ] AttributeType
+					| Array Integer AttributeType
 					deriving (Show, Eq)
 
 data SimpleType = String
@@ -147,6 +147,10 @@ createProcedureParametersByValueDefinitionsOfType namesList t = map (\x -> defau
 
 createProcedureParametersByReferenceDefinitionsOfType :: [String] -> AttributeType -> [Attribute]
 createProcedureParametersByReferenceDefinitionsOfType namesList t = map (\x -> defaultAttribute {attributeName = x, attributeType = t, isParameter = True, isPassedByReference = True}) namesList
+
+createMultidimensionalArrayOfType :: [Integer] -> AttributeType -> AttributeType
+createMultidimensionalArrayOfType [x] typ = Array x typ
+createMultidimensionalArrayOfType lst typ = Array (head lst) (createMultidimensionalArrayOfType (tail lst) typ)
 
 updateStackAttr :: [Procedure] -> Procedure -> [Procedure]
 updateStackAttr (x:xs) updatedProc = updatedProc : xs
