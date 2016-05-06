@@ -198,8 +198,8 @@ mkL c (p, _, _, str) len =  let t = take len str
                                           Lex_TokenVariableIdentifier     -> return (TokenVariableIdentifier t p)
                                           Lex_TokenIntegerNumber          -> return (TokenIntegerNumber ((read t) :: Integer) p)
                                           Lex_TokenRealNumber             -> return (TokenRealNumber ((read t) :: Float) p)
-                                          Lex_TokenValidChar              -> return (TokenValidChar (head t) p)
-                                          Lex_TokenValidString            -> return (TokenValidString t p)
+                                          Lex_TokenValidChar              -> return (TokenValidChar (head (tail t)) p)
+                                          Lex_TokenValidString            -> return (TokenValidString (init (tail t)) p)
                                           Lex_EOF                         -> return (EOF)
 
 alexEOF :: Alex Token

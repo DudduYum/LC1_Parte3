@@ -441,8 +441,8 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
 						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = (fltVal $1) } }
                 | KW_TRUE             { defaultAttribute { attributeType = Simple Boolean, booleanValue = True } }
                 | KW_FALSE            { defaultAttribute { attributeType = Simple Boolean, booleanValue = False } }
-						    |	'"' validChar '"'   { defaultAttribute { attributeType = Simple Char, charValue = (chrVal $2) } }
-						    |	'"' validString '"' { defaultAttribute { attributeType = Simple String, stringValue = (strVal $2) } }
+						    |	validChar           { defaultAttribute { attributeType = Simple Char, charValue = (chrVal $1) } }
+						    |	validString         { defaultAttribute { attributeType = Simple String, stringValue = (strVal $1) } }
 						    |	'(' expression ')'  { $2 }
     						|	'~' factor          {
                                         do
