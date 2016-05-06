@@ -48,7 +48,7 @@ instance Pretty a => Pretty ( Program a ) where
         
         
         
-        
+-- Manca da sistemare l'indentazione nelle instances delle procedure ( IF, WHILE ecc... )
         
         
  class PrettyPrinter a where       
@@ -73,6 +73,8 @@ data AttributeType 	= Simple SimpleType
                         deriving (Show, Eq)
 instance PrettyPrinter AttributeType where
     toDoc Simple SimpleType = text
+    toDoc UnsizedArray AttributeType = text 
+    toDoc Array Integer AttributeType = text
                         
 
 data SimpleType = ( String n )
@@ -112,21 +114,21 @@ data BasicOperation = OP_add Attribute Attribute
 					| OP_neq Attribute Attribute
                                         deriving (Show, Eq)
 instance PrettyPrinter BasicOperation where
-    toDoc OP_sub Attribute Attribute = toDoc Attribute <+> text "-" <+> text Attribute
-    toDoc OP_iden_add Attribute = toDoc Attribute <+> text "+" <+> text Attribute       -- Non sicuro
-    toDoc OP_iden_sub Attribute = toDoc Attribute <+> text "-" <+> text Attribute                                    
-    toDoc OP_div Attribute Attribute = toDoc Attribute <+> text "DIV" <+> text Attribute
-    toDoc OP_mul Attribute Attribute = toDoc Attribute <+> text "*" <+> text Attribute
-    toDoc OP_quot Attribute Attribute = toDoc Attribute <+> text "/" <+> text Attribute
-    toDoc OP_mod Attribute Attribute = toDoc Attribute <+> text "MOD" <+> text Attribute
-    toDoc OP_and Attribute Attribute = toDoc Attribute <+> text "AND" <+> text Attribute
-    toDoc OP_or Attribute Attribute = toDoc Attribute <+> text "OR" <+> text Attribute
-    toDoc OP_min Attribute Attribute = toDoc Attribute <+> text "<" <+> text Attribute
-    toDoc OP_mineq Attribute Attribute = toDoc Attribute <+> text "<=" <+> text Attribute
-    toDoc OP_maj Attribute Attribute = toDoc Attribute <+> text ">" <+> text Attribute
-    toDoc OP_majeq Attribute Attribute = toDoc Attribute <+> text ">=" <+> text Attribute
-    toDoc OP_eq Attribute Attribute = toDoc Attribute <+> text "=" <+> text Attribute
-    toDoc OP_neq Attribute Attribute = toDoc Attribute <+> text "!=" <+> text Attribute
+    toDoc OP_sub Attribute Attribute = toDoc Attribute <+> text "-" <+> toDoc Attribute
+    toDoc OP_iden_add Attribute = toDoc Attribute <+> text "+" <+> toDoc Attribute       -- Non sicuro
+    toDoc OP_iden_sub Attribute = toDoc Attribute <+> text "-" <+> toDoc Attribute       -- Non sicuro                           
+    toDoc OP_div Attribute Attribute = toDoc Attribute <+> text "DIV" <+> toDoc Attribute
+    toDoc OP_mul Attribute Attribute = toDoc Attribute <+> text "*" <+> toDoc Attribute
+    toDoc OP_quot Attribute Attribute = toDoc Attribute <+> text "/" <+> toDoc Attribute
+    toDoc OP_mod Attribute Attribute = toDoc Attribute <+> text "MOD" <+> toDoc Attribute
+    toDoc OP_and Attribute Attribute = toDoc Attribute <+> text "AND" <+> toDoc Attribute
+    toDoc OP_or Attribute Attribute = toDoc Attribute <+> text "OR" <+> toDoc Attribute
+    toDoc OP_min Attribute Attribute = toDoc Attribute <+> text "<" <+> toDoc Attribute
+    toDoc OP_mineq Attribute Attribute = toDoc Attribute <+> text "<=" <+> toDoc Attribute
+    toDoc OP_maj Attribute Attribute = toDoc Attribute <+> text ">" <+> toDoc Attribute
+    toDoc OP_majeq Attribute Attribute = toDoc Attribute <+> text ">=" <+> toDoc Attribute
+    toDoc OP_eq Attribute Attribute = toDoc Attribute <+> text "=" <+> toDoc Attribute
+    toDoc OP_neq Attribute Attribute = toDoc Attribute <+> text "!=" <+> toDoc Attribute
                                         
                                         
                                         
@@ -145,14 +147,34 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_Repeat [Operation] Attribute
 				| OP_Loop [Operation]
 				deriving (Show, Eq)
-
+instance PrettyPrinter Operation where
+    toDoc OP_Assignment Attribute Attribute = toDoc Attribute <+> text ":=" <+> toDoc Attribute
+    toDoc OP_ProcedureCall Attribute [Attribute] = text "PROCEDURE" <+> text 
+    toDoc OP_Exit = text "EXIT"
+    toDoc OP_Continue = text "CONTINUE"
+    toDoc OP_Break = text "BREAK"
+    toDoc OP_Return (Maybe Attribute) = text "RETURN" (Maybe <+> toDoc Attribute)               -- Non sicuro
+    toDoc OP_If (Attribute, [Operation]) = text "IF" <+> toDoc Attribute <+> toDoc Operation
+    toDoc OP_If_Else (Attribute, [Operation], [Operation]) = text "IF ELSE" <+> toDoc Attribute <+> toDoc Operation <+> toDoc Operation
+    toDoc OP_If_Elsif [(Attribute, [Operation])] = text "IF ELSE IF" <+> toDoc Attribute <+> toDoc Operation
+    toDoc OP_If_Elsif_Else ([(Attribute, [Operation])], [Operation]) = text "IF ELSE IF ELSE" <+> toDoc Attribute <+> toDoc Operation <+> toDoc Operation
+    toDoc OP_While Attribute [Operation] = text "WHILE" <+> toDoc Attribute <+> toDoc Operation
+    toDoc OP_Repeat [Operation] Attribute = text "REPEAT" <+> toDoc Operation <+> toDoc Attribute
+    toDoc OP_Loop [Operation] = text "LOOP" <+> toDoc Operation
+    
+    
+				
 				
 data DeclarationType 	= DT_Variable
 						| DT_Constant
 						| DT_Procedure
 						| DT_Operation
 						deriving (Show, Eq)
-
+instance PrettyPrinter DeclarationType where
+    toDoc DT_Variable = text
+    toDoc DT_Constant = text
+    toDoc DT_Procedure = text
+    toDoc DT_Operation = text
 
         
         
