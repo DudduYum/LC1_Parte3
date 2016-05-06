@@ -1,13 +1,26 @@
- 
 PROCEDURE p1;
-	CONST 	x = "ciao";
-			y = 5+4-(2*x);
+	CONST 	m = "aaa";
+			y = 5+4-(2*11);
+	VAR x, f, kk, cc, t, h: INTEGER;
+		g: CHAR;
+		l: REAL;
+		k: ARRAY 100 OF CHAR;
+		v1: ARRAY 5 OF INTEGER;
+		v2: ARRAY 10,10 OF INTEGER;
+		r1: INTEGER;
+		r2: REAL;
+		r3: CHAR;
+		r4: ARRAY 30 OF CHAR;
+		z: CHAR;
+	PROCEDURE test(VAR par : INTEGER) : CHAR;
+		CONST ll = 5;
+	BEGIN
+		RETURN "b";
+	END test
 BEGIN
 	x := 5;
 	z := test(x);
-	EXIT;
-	RETURN;
-	RETURN 5;
+
 	IF 5 = 5 THEN
 		f := 5;
 	ELSE
@@ -25,13 +38,14 @@ BEGIN
 	ELSIF 3 > 2 THEN
 		cc := 9;
 	ELSE
-		k := "ciccio";
+		k := "pippo";
 	END;
 
 	WHILE x < 5 DO
+		IF x = 3 THEN
+			CONTINUE;
+		END;
 		x := x+1;
-		BREAK;
-		CONTINUE;
 	END;
 
 	REPEAT
@@ -41,8 +55,19 @@ BEGIN
 
 	LOOP
 		s := v;
+		BREAK;
 	END;
 
-	h := v[5];
-	h := v[5][6];
+	h := v1[5];
+	h := v2[5][6];
+
+	WRITEINT(x);
+	WRITEFLOAT(l);
+	WRITECHAR(g);
+	WRITESTRING(k);
+
+	r1 := READINT;
+	r2 := READFLOAT;
+	r3 := READCHAR;
+	r3 := READSTRING;
 END p1

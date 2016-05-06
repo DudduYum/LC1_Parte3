@@ -39,11 +39,11 @@ import OberonTools
   KW_BREAK              { KW_TokenBreak _ }
   KW_CONTINUE           { KW_TokenContinue _ }
   KW_WRITEINT           { KW_TokenWriteInt _ }
-  KW_WRITEFLOAT         { KW_TokenWriteFloat _ }
+  KW_WRITEREAL          { KW_TokenWriteReal _ }
   KW_WRITECHAR          { KW_TokenWriteChar _ }
   KW_WRITESTRING        { KW_TokenWriteString _ }
   KW_READINT            { KW_TokenReadInt _ }
-  KW_READFLOAT          { KW_TokenReadFloat _ }
+  KW_READREAL           { KW_TokenReadReal _ }
   KW_READCHAR           { KW_TokenReadChar _ }
   KW_READSTRING         { KW_TokenReadString _ }
   KW_OR                 { KW_TokenOr _ }
@@ -131,25 +131,19 @@ DeclarationSequenceList : DeclarationSequence                         { $1 }
 StatementSequence   : statement ';'                     { [$1] }
                     | statement ';' StatementSequence   { $1:$3 }
 
-LoopStatementSequence : statement ';'                         { [$1] }
-                      | KW_BREAK ';'                          { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Break })] }
-                      | KW_CONTINUE ';'                       { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Continue })] }
-                      | statement ';' LoopStatementSequence   { [$1]++$3 }
-                      | KW_BREAK ';' LoopStatementSequence    { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Break })]++$3 }
-                      | KW_CONTINUE ';' LoopStatementSequence { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Continue })]++$3 }
-
-
 statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
             |   ProcedureCall                           { $1 }
             |   IfStatement                             { $1 }
             |   CaseStatement                           { $1 }
+            |   KW_BREAK                                { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Break } }
+            |   KW_CONTINUE                             { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Continue } }
             |   KW_WRITEINT expression                  { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_WriteInt $2) } }
-            |   KW_WRITEFLOAT expression                { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_WriteFloat $2) } }
+            |   KW_WRITEREAL  expression                { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_WriteReal $2) } }
             |   KW_WRITECHAR expression                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_WriteChar $2) } }
             |   KW_WRITESTRING expression               { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_WriteString $2) } }
-            |   KW_WHILE expression KW_DO LoopStatementSequence KW_END    { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
-            |   KW_REPEAT LoopStatementSequence KW_UNTIL expression       { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Repeat (declarationListToOperationList $2) $4 ) } }
-            |   KW_LOOP LoopStatementSequence KW_END                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Loop (declarationListToOperationList $2) ) } }
+            |   KW_WHILE expression KW_DO StatementSequence KW_END    { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
+            |   KW_REPEAT StatementSequence KW_UNTIL expression       { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Repeat (declarationListToOperationList $2) $4 ) } }
+            |   KW_LOOP StatementSequence KW_END                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Loop (declarationListToOperationList $2) ) } }
             |   KW_EXIT                                   { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Exit } }
             |   KW_RETURN                                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return Nothing) } }
             |   KW_RETURN expression                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return (Just $2)) } }
@@ -640,7 +634,7 @@ factor	 				:	integerNum                  { defaultAttribute { attributeType = S
                 | designator                  { $1 }
                 | designator ActualParameters { $1 { isProcedureCall = True, procCallParams = $2 } }
                 | KW_READINT                  { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just OP_read_int } }
-                | KW_READFLOAT                { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just OP_read_float } }
+                | KW_READREAL                 { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just OP_read_real } }
                 | KW_READCHAR                 { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just OP_read_char } }
                 | KW_READSTRING               { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just OP_read_string } }
 

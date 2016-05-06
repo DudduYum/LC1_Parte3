@@ -34,7 +34,7 @@ data BasicOperation = OP_add Attribute Attribute
 					| OP_neq Attribute Attribute
 					| OP_arr_ext Attribute [Attribute]
 					| OP_read_int
-					| OP_read_float
+					| OP_read_real
 					| OP_read_char
 					| OP_read_string
 					deriving (Show, Eq)
@@ -55,7 +55,7 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_Repeat [Operation] Attribute
 				| OP_Loop [Operation]
 				| OP_WriteInt Attribute
-				| OP_WriteFloat Attribute
+				| OP_WriteReal Attribute
 				| OP_WriteChar Attribute
 				| OP_WriteString Attribute
 				deriving (Show, Eq)

@@ -41,11 +41,11 @@ tokens :-
   "BREAK"                   { mkL Lex_KW_TokenBreak }
   "CONTINUE"                { mkL Lex_KW_TokenContinue }
   "WRITEINT"                { mkL Lex_KW_TokenWriteInt }
-  "WRITEFLOAT"              { mkL Lex_KW_TokenWriteFloat }
+  "WRITEREAL"               { mkL Lex_KW_TokenWriteReal }
   "WRITECHAR"               { mkL Lex_KW_TokenWriteChar }
   "WRITESTRING"             { mkL Lex_KW_TokenWriteString }
   "READINT"                 { mkL Lex_KW_TokenReadInt }
-  "READFLOAT"               { mkL Lex_KW_TokenReadFloat }
+  "READFLOAT"               { mkL Lex_KW_TokenReadReal }
   "READCHAR"                { mkL Lex_KW_TokenReadChar }
   "READSTRING"              { mkL Lex_KW_TokenReadString }
 
@@ -117,11 +117,11 @@ data LexClass =
   Lex_KW_TokenBreak               |
   Lex_KW_TokenContinue            |
   Lex_KW_TokenWriteInt            |
-  Lex_KW_TokenWriteFloat          |
+  Lex_KW_TokenWriteReal           |
   Lex_KW_TokenWriteChar           |
   Lex_KW_TokenWriteString         |
   Lex_KW_TokenReadInt             |
-  Lex_KW_TokenReadFloat           |
+  Lex_KW_TokenReadReal            |
   Lex_KW_TokenReadChar            |
   Lex_KW_TokenReadString          |
   Lex_KW_TokenOr                  |
@@ -189,11 +189,11 @@ mkL c (p, _, _, str) len =  let t = take len str
                                           Lex_KW_TokenBreak               -> return (KW_TokenBreak p)
                                           Lex_KW_TokenContinue            -> return (KW_TokenContinue p)
                                           Lex_KW_TokenWriteInt            -> return (KW_TokenWriteInt p)
-                                          Lex_KW_TokenWriteFloat          -> return (KW_TokenWriteFloat p)
+                                          Lex_KW_TokenWriteReal           -> return (KW_TokenWriteReal p)
                                           Lex_KW_TokenWriteChar           -> return (KW_TokenWriteChar p)
                                           Lex_KW_TokenWriteString         -> return (KW_TokenWriteString p)
                                           Lex_KW_TokenReadInt             -> return (KW_TokenReadInt p)
-                                          Lex_KW_TokenReadFloat           -> return (KW_TokenReadFloat p)
+                                          Lex_KW_TokenReadReal            -> return (KW_TokenReadReal p)
                                           Lex_KW_TokenReadChar            -> return (KW_TokenReadChar p)
                                           Lex_KW_TokenReadString          -> return (KW_TokenReadString p)
                                           Lex_KW_TokenOr                  -> return (KW_TokenOr p)
@@ -264,11 +264,11 @@ data Token =
   KW_TokenBreak                   { position :: AlexPosn } |
   KW_TokenContinue                { position :: AlexPosn } |
   KW_TokenWriteInt                { position :: AlexPosn } |
-  KW_TokenWriteFloat              { position :: AlexPosn } |
+  KW_TokenWriteReal               { position :: AlexPosn } |
   KW_TokenWriteChar               { position :: AlexPosn } |
   KW_TokenWriteString             { position :: AlexPosn } |
   KW_TokenReadInt                 { position :: AlexPosn } |
-  KW_TokenReadFloat               { position :: AlexPosn } |
+  KW_TokenReadReal                { position :: AlexPosn } |
   KW_TokenReadChar                { position :: AlexPosn } |
   KW_TokenReadString              { position :: AlexPosn } |
   KW_TokenOr                      { position :: AlexPosn } |
