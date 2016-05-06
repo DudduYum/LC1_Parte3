@@ -97,6 +97,7 @@ module TypeCheck
   --
   -- genereteMesege errStr (Err a) = return (Simple Float)
 
+-- per risolvere la compatibilia' di tipi
   solveType attType@( a , b ) = let
     swapedTypes = typeSwap attType
     in case attType of
