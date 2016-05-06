@@ -27,7 +27,7 @@ data Program a =	Procedure a
 		|	Begin a
 		|	End a
 		|	Var a
-		|	Adding a			-- assegnamento, da controllare
+		|	a			-- assegnamento, da controllare
 		|	If a
 		|	Elseif a
 		|	Else a
