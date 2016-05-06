@@ -1,7 +1,16 @@
 PROCEDURE p1;
-	VAR g: INTEGER;
+	VAR i,j:INTEGER;
 BEGIN
-	CASE g OF 	5: x := 7;
-			|	4: v(g);
+	WHILE j > 1 DO
+		x := x+1;
+		WRITEINT(x);
+		WRITEFLOAT(x);
+		WRITECHAR(x);
+		WRITESTRING(x);
+
+		h := READINT;
+		h := READFLOAT;
+		h := READCHAR;
+		h := READSTRING;
 	END;
 END p1

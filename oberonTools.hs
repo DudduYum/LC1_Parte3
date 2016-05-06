@@ -33,6 +33,10 @@ data BasicOperation = OP_add Attribute Attribute
 					| OP_eq Attribute Attribute
 					| OP_neq Attribute Attribute
 					| OP_arr_ext Attribute [Attribute]
+					| OP_read_int
+					| OP_read_float
+					| OP_read_char
+					| OP_read_string
 					deriving (Show, Eq)
 
 data Operation 	= OP_Assignment Attribute Attribute
@@ -50,6 +54,10 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_While Attribute [Operation]
 				| OP_Repeat [Operation] Attribute
 				| OP_Loop [Operation]
+				| OP_WriteInt Attribute
+				| OP_WriteFloat Attribute
+				| OP_WriteChar Attribute
+				| OP_WriteString Attribute
 				deriving (Show, Eq)
 
 data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tipo di attributo (float, integer, ecc)

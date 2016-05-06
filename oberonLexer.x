@@ -40,6 +40,14 @@ tokens :-
   "RETURN"                  { mkL Lex_KW_TokenReturn }
   "BREAK"                   { mkL Lex_KW_TokenBreak }
   "CONTINUE"                { mkL Lex_KW_TokenContinue }
+  "WRITEINT"                { mkL Lex_KW_TokenWriteInt }
+  "WRITEFLOAT"              { mkL Lex_KW_TokenWriteFloat }
+  "WRITECHAR"               { mkL Lex_KW_TokenWriteChar }
+  "WRITESTRING"             { mkL Lex_KW_TokenWriteString }
+  "READINT"                 { mkL Lex_KW_TokenReadInt }
+  "READFLOAT"               { mkL Lex_KW_TokenReadFloat }
+  "READCHAR"                { mkL Lex_KW_TokenReadChar }
+  "READSTRING"              { mkL Lex_KW_TokenReadString }
 
   -- Operators
   "OR"                      { mkL Lex_KW_TokenOr }
@@ -73,8 +81,8 @@ tokens :-
   $alpha [$alpha $digit \_]* { mkL Lex_TokenVariableIdentifier }
 
   -- Numeri e stringhe
-  [1-9] $digit*             { mkL Lex_TokenIntegerNumber }
-  [1-9] $digit* "." $digit+ { mkL Lex_TokenRealNumber }
+  $digit+                   { mkL Lex_TokenIntegerNumber }
+  $digit+ "." $digit+       { mkL Lex_TokenRealNumber }
   \" $validChar \"          { mkL Lex_TokenValidChar }
   \" $validChar* \"         { mkL Lex_TokenValidString }
 {
@@ -108,6 +116,14 @@ data LexClass =
   Lex_KW_TokenReturn              |
   Lex_KW_TokenBreak               |
   Lex_KW_TokenContinue            |
+  Lex_KW_TokenWriteInt            |
+  Lex_KW_TokenWriteFloat          |
+  Lex_KW_TokenWriteChar           |
+  Lex_KW_TokenWriteString         |
+  Lex_KW_TokenReadInt             |
+  Lex_KW_TokenReadFloat           |
+  Lex_KW_TokenReadChar            |
+  Lex_KW_TokenReadString          |
   Lex_KW_TokenOr                  |
   Lex_KW_TokenCommercialE         |
   Lex_KW_TokenTilde               |
@@ -172,6 +188,14 @@ mkL c (p, _, _, str) len =  let t = take len str
                                           Lex_KW_TokenReturn              -> return (KW_TokenReturn p)
                                           Lex_KW_TokenBreak               -> return (KW_TokenBreak p)
                                           Lex_KW_TokenContinue            -> return (KW_TokenContinue p)
+                                          Lex_KW_TokenWriteInt            -> return (KW_TokenWriteInt p)
+                                          Lex_KW_TokenWriteFloat          -> return (KW_TokenWriteFloat p)
+                                          Lex_KW_TokenWriteChar           -> return (KW_TokenWriteChar p)
+                                          Lex_KW_TokenWriteString         -> return (KW_TokenWriteString p)
+                                          Lex_KW_TokenReadInt             -> return (KW_TokenReadInt p)
+                                          Lex_KW_TokenReadFloat           -> return (KW_TokenReadFloat p)
+                                          Lex_KW_TokenReadChar            -> return (KW_TokenReadChar p)
+                                          Lex_KW_TokenReadString          -> return (KW_TokenReadString p)
                                           Lex_KW_TokenOr                  -> return (KW_TokenOr p)
                                           Lex_KW_TokenCommercialE         -> return (KW_TokenCommercialE p)
                                           Lex_KW_TokenTilde               -> return (KW_TokenTilde p)
@@ -239,6 +263,14 @@ data Token =
   KW_TokenReturn                  { position :: AlexPosn } |
   KW_TokenBreak                   { position :: AlexPosn } |
   KW_TokenContinue                { position :: AlexPosn } |
+  KW_TokenWriteInt                { position :: AlexPosn } |
+  KW_TokenWriteFloat              { position :: AlexPosn } |
+  KW_TokenWriteChar               { position :: AlexPosn } |
+  KW_TokenWriteString             { position :: AlexPosn } |
+  KW_TokenReadInt                 { position :: AlexPosn } |
+  KW_TokenReadFloat               { position :: AlexPosn } |
+  KW_TokenReadChar                { position :: AlexPosn } |
+  KW_TokenReadString              { position :: AlexPosn } |
   KW_TokenOr                      { position :: AlexPosn } |
   KW_TokenCommercialE             { position :: AlexPosn } |
   KW_TokenTilde                   { position :: AlexPosn } |
