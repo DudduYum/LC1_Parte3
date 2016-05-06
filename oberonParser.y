@@ -123,7 +123,7 @@ StatementSequence   : statement ';'                     { [$1] }
                     | statement ';' StatementSequence   { $1:$3 }
 
 statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
---            | ProcedureCall
+            |   ProcedureCall                           { $1 }
 --            | IfStatement
 --            | CaseStatement
 --            | WhileStatement
@@ -132,6 +132,39 @@ statement   :   designator KW_Assignment expression     { defaultDeclaration { d
 --            | KW_EXIT
 --            | KW_RETURN
 --            | KW_RETURN expression
+
+ProcedureCall : designator                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 []) } }
+              | designator ActualParameters     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 $2) } }
+
+ActualParameters  : '(' ')'           { [] }
+                  | '(' ExpList ')'   { $2 }
+
+--IfStatement       : KW_IF expression KW_THEN StatementSequence KW_END
+--            | KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
+--            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
+--            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
+
+--ElseIfList        : KW_ELSIF expression KW_THEN StatementSequence
+--            | KW_ELSIF expression KW_THEN StatementSequence ElseIfList
+
+--CaseStatement       :   KW_CASE expression KW_OF Case KW_END
+--            | KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
+--            | KW_CASE expression KW_OF CaseList KW_END
+--            | KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
+
+--Case          : CaseLabelList ':' StatementSequence
+
+--CaseLabelList       : CaseLabels
+--            | CaseLabels ',' CaseLabelList
+
+--CaseLabels        : ConstExpression
+--            | ConstExpression '..' ConstExpression
+
+--WhileStatement      : KW_WHILE expression KW_DO StatementSequence KW_END
+
+--RepeatStatement     : KW_REPEAT StatementSequence KW_UNTIL expression
+
+--LoopStatement       : KW_LOOP StatementSequence KW_END
 
 ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
                       | ConstDeclaration ';' ConstDeclarationList   { $1:$3 }
@@ -188,8 +221,8 @@ designator    :	  identifier                      { defaultAttribute { attribute
 --						|	'[' ExpList ']'
 --						|	'[' ExpList ']' designatorHelper
 
---ExpList					: 	expression
---						|	expression ',' ExpList
+ExpList		:  expression              { [$1] }
+					|  expression ',' ExpList  { $1:$3 }
 
 expression 		: 	SimpleExpression                                { $1 }
 						  | 	SimpleExpression '=' SimpleExpression           {
@@ -204,7 +237,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_eq expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_eq expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -231,7 +264,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_neq expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_neq expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -258,7 +291,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_min expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_min expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -285,7 +318,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mineq expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_mineq expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -312,7 +345,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_maj expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_maj expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -339,7 +372,7 @@ expression 		: 	SimpleExpression                                { $1 }
                                                                               let expRes2 = getMaybeValue tmp2
 
                                                                               if (attributeType expRes1 == Simple Unknown) || (attributeType expRes2 == Simple Unknown) || (attributeType expRes1 == Simple Name) || (attributeType expRes2 == Simple Name) then
-                                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_majeq expRes1 expRes2) }
+                                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_majeq expRes1 expRes2) }
                                                                               else if not (attributesSameType expRes1 expRes2) then
                                                                                 fatalError ("Invalid operation. Cannot compare two different types") (getRow (position $2)) (getCol (position $2))
                                                                               else
@@ -366,7 +399,7 @@ SimpleExpression		:	term                        { $1 }
                                                               let val = getMaybeValue tmp1
 
                                                               if (attributeType val == Simple Unknown) || (attributeType val == Simple Name) then
-                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_iden_add val) }
+                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_iden_add val) }
                                                               else if (attributeIsOfType val (Simple Integer)) || (attributeIsOfType val (Simple Float)) then
                                                                 val
                                                               else
@@ -382,7 +415,7 @@ SimpleExpression		:	term                        { $1 }
                                                               let val = getMaybeValue tmp1
                                                       
                                                               if (attributeType val == Simple Unknown) || (attributeType val == Simple Name) then
-                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_iden_sub val) }
+                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_iden_sub val) }
                                                               else if attributeIsOfType val (Simple Integer) then
                                                                 defaultAttribute { attributeType = Simple Integer, integerValue = -(integerValue val) }
                                                               else if attributeIsOfType val (Simple Float) then
@@ -402,7 +435,7 @@ SimpleExpression		:	term                        { $1 }
                                                               let t2 = getMaybeValue tmp2
 
                                                               if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_add t1 t2) }
+                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_add t1 t2) }
                                                               else if attributesSameType t1 t2 then
                                                                 -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
                                                                 if attributeIsOfType t1 (Simple Float) then
@@ -432,7 +465,7 @@ SimpleExpression		:	term                        { $1 }
                                                               let t2 = getMaybeValue tmp2
 
                                                               if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_sub t1 t2) }
+                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_sub t1 t2) }
                                                               else if attributesSameType t1 t2 then
                                                                 -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
                                                                 if attributeIsOfType t1 (Simple Float) then
@@ -460,7 +493,7 @@ SimpleExpression		:	term                        { $1 }
                                                               let t2 = getMaybeValue tmp2
 
                                                               if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                                defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_or t1 t2) }
+                                                                defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_or t1 t2) }
                                                               else if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
                                                                   defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) || (booleanValue t2) }
                                                               else
@@ -480,7 +513,7 @@ term 					:	factor                { $1 }
                                                   let t2 = getMaybeValue tmp2
 
                                                   if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mul t1 t2) }
+                                                    defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_mul t1 t2) }
                                                   else if attributesSameType t1 t2 then
                                                     -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
                                                     if attributeIsOfType t1 (Simple Float) then
@@ -508,7 +541,7 @@ term 					:	factor                { $1 }
                                                   let t2 = getMaybeValue tmp2
 
                                                   if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_div t1 t2) }
+                                                    defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_div t1 t2) }
                                                   else if attributesSameType t1 t2 then
                                                     -- basta controllare uno solo dei due operandi perche' so che sono dello stesso tipo
                                                     if attributeIsOfType t1 (Simple Float) then
@@ -536,7 +569,7 @@ term 					:	factor                { $1 }
                                                   let t2 = getMaybeValue tmp2
 
                                                   if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_quot t1 t2) }
+                                                    defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_quot t1 t2) }
                                                   else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
                                                     defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `quot` (integerValue t2) }
                                                   else
@@ -554,7 +587,7 @@ term 					:	factor                { $1 }
                                                   let t2 = getMaybeValue tmp2
 
                                                   if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_mod t1 t2) }
+                                                    defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_mod t1 t2) }
                                                   else if (attributeType t1 == Simple Integer) && (attributeType t2 == Simple Integer) then
                                                     defaultAttribute { attributeType = Simple Integer, integerValue = (integerValue t1) `mod` (integerValue t2) }
                                                   else
@@ -572,64 +605,31 @@ term 					:	factor                { $1 }
                                                   let t2 = getMaybeValue tmp2
 
                                                   if (attributeType t1 == Simple Unknown) || (attributeType t2 == Simple Unknown) || (attributeType t1 == Simple Name) || (attributeType t2 == Simple Name) then
-                                                    defaultAttribute { attributeType = Simple Unknown, isBasicOperationResult = True, basicOperation = Just (OP_and t1 t2) }
+                                                    defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_and t1 t2) }
                                                   else if (attributeType t1 == Simple Boolean) && (attributeType t2 == Simple Boolean) then
                                                     defaultAttribute { attributeType = Simple Boolean, booleanValue = (booleanValue t1) && (booleanValue t2) }
                                                   else
                                                     fatalError ("Invalid operation. Logical AND operation is valid only between two BOOLEAN") (getRow (position $2)) (getCol (position $2))
                                       }
 
-factor	 				:	integerNum          { defaultAttribute { attributeType = Simple Integer, integerValue = (intVal $1) } }
-						    |	realNum             { defaultAttribute { attributeType = Simple Float, floatValue = (fltVal $1) } }
-                | KW_TRUE             { defaultAttribute { attributeType = Simple Boolean, booleanValue = True } }
-                | KW_FALSE            { defaultAttribute { attributeType = Simple Boolean, booleanValue = False } }
-						    |	validChar           { defaultAttribute { attributeType = Simple Char, charValue = (chrVal $1) } }
-						    |	validString         { defaultAttribute { attributeType = Simple String, stringValue = (strVal $1) } }
-						    |	'(' expression ')'  { $2 }
-    						|	'~' factor          {
-                                        do
-                                          let val = $2
+factor	 				:	integerNum                  { defaultAttribute { attributeType = Simple Integer, integerValue = (intVal $1) } }
+						    |	realNum                     { defaultAttribute { attributeType = Simple Float, floatValue = (fltVal $1) } }
+                | KW_TRUE                     { defaultAttribute { attributeType = Simple Boolean, booleanValue = True } }
+                | KW_FALSE                    { defaultAttribute { attributeType = Simple Boolean, booleanValue = False } }
+						    |	validChar                   { defaultAttribute { attributeType = Simple Char, charValue = (chrVal $1) } }
+						    |	validString                 { defaultAttribute { attributeType = Simple String, stringValue = (strVal $1) } }
+						    |	'(' expression ')'          { $2 }
+    						|	'~' factor                  {
+                                                do
+                                                  let val = $2
 
-                                          if attributeType val == Simple Boolean then
-                                            defaultAttribute { attributeType = Simple Boolean, booleanValue = not (booleanValue val) }
-                                          else
-                                            fatalError ("Invalid operation. Logical NOT operation is valid only with a BOOLEAN") (getRow (position $1)) (getCol (position $1))
-                                      }
-                | designator          { $1 }
---                | designator ActualParameters
-
---ActualParameters		: 	'(' ')'
---						|	'(' ExpList ')'
-
---ProcedureCall 			:	designator
---						|	designator ActualParameters
-
---IfStatement 			:	KW_IF expression KW_THEN StatementSequence KW_END
---						|	KW_IF expression KW_THEN StatementSequence KW_ELSE StatementSequence KW_END
---						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
---						|	KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
-
---ElseIfList 				:	KW_ELSIF expression KW_THEN StatementSequence
---						|	KW_ELSIF expression KW_THEN StatementSequence ElseIfList
-
---CaseStatement 			: 	KW_CASE expression KW_OF Case KW_END
---						|	KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
---						|	KW_CASE expression KW_OF CaseList KW_END
---						|	KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
-
---Case 					:	CaseLabelList ':' StatementSequence
-
---CaseLabelList 			:	CaseLabels
---						|	CaseLabels ',' CaseLabelList
-
---CaseLabels 				:	ConstExpression
---						|	ConstExpression '..' ConstExpression
-
---WhileStatement 			:	KW_WHILE expression KW_DO StatementSequence KW_END
-
---RepeatStatement			:	KW_REPEAT StatementSequence KW_UNTIL expression
-
---LoopStatement 			:	KW_LOOP StatementSequence KW_END
+                                                  if attributeType val == Simple Boolean then
+                                                    defaultAttribute { attributeType = Simple Boolean, booleanValue = not (booleanValue val) }
+                                                  else
+                                                    fatalError ("Invalid operation. Logical NOT operation is valid only with a BOOLEAN") (getRow (position $1)) (getCol (position $1))
+                                              }
+                | designator                  { $1 }
+                | designator ActualParameters { $1 { isProcedureCall = True, procCallParams = $2 } }
 
 {
 

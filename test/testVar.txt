@@ -3,4 +3,5 @@ PROCEDURE p1;
 			y = 5+4-(2*x);
 BEGIN
 	x := 5;
+	z := test(x);
 END p1

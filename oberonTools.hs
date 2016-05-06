@@ -35,7 +35,7 @@ data BasicOperation = OP_add Attribute Attribute
 					deriving (Show, Eq)
 
 data Operation 	= OP_Assignment Attribute Attribute
---				| OP_ProcedureCall Procedure [Attribute]
+				| OP_ProcedureCall Attribute [Attribute]
 --				| OP_If Attribute [Operation]
 				deriving (Show, Eq)
 
@@ -54,7 +54,8 @@ data Attribute = Attribute {	attributeType :: AttributeType,
 								charArrayValue :: [Char],
 								booleanArrayValue :: [Bool],
 								basicOperation :: Maybe BasicOperation,
-								isBasicOperationResult :: Bool,
+								procCallParams :: [Attribute],
+								isProcedureCall :: Bool,
 								isConstant :: Bool,
 								isParameter :: Bool,
 								isPassedByReference :: Bool } deriving (Show, Eq)
@@ -93,7 +94,8 @@ defaultAttribute = Attribute {	attributeName = "",
 								charArrayValue = [],
 								booleanArrayValue = [],
 								basicOperation = Nothing,
-								isBasicOperationResult = False,
+								procCallParams = [],
+								isProcedureCall = False,
 								isConstant = False,
 								isParameter = False,
 								isPassedByReference = False }
