@@ -16,7 +16,6 @@ tokens :-
   "REAL"                    { mkL Lex_KW_TokenReal }
   "BOOLEAN"                 { mkL Lex_KW_TokenBoolean }
   "CHAR"                    { mkL Lex_KW_TokenChar }
-  "SET"                     { mkL Lex_KW_TokenSet }
   "ARRAY"                   { mkL Lex_KW_TokenArray }
   "OF"                      { mkL Lex_KW_TokenOf }
   "POINTER TO"              { mkL Lex_KW_TokenPointerTo }
@@ -84,7 +83,6 @@ data LexClass =
   Lex_KW_TokenReal                |
   Lex_KW_TokenBoolean             |
   Lex_KW_TokenChar                |
-  Lex_KW_TokenSet                 |
   Lex_KW_TokenArray               |
   Lex_KW_TokenOf                  |
   Lex_KW_TokenPointerTo           |
@@ -148,7 +146,6 @@ mkL c (p, _, _, str) len =  let t = take len str
                                           Lex_KW_TokenReal                -> return (KW_TokenReal p)
                                           Lex_KW_TokenBoolean             -> return (KW_TokenBoolean p)
                                           Lex_KW_TokenChar                -> return (KW_TokenChar p)
-                                          Lex_KW_TokenSet                 -> return (KW_TokenSet p)
                                           Lex_KW_TokenArray               -> return (KW_TokenArray p)
                                           Lex_KW_TokenOf                  -> return (KW_TokenOf p)
                                           Lex_KW_TokenPointerTo           -> return (KW_TokenPointerTo p)

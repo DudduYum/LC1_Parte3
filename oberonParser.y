@@ -139,7 +139,6 @@ type 				: 	KW_INTEGER                        { Simple Integer }
                                                         createMultidimensionalArrayOfType lenList $4
                                                   }
 --						|	PointerType
---						|	ProcedureType
 
 lenghtList 				: 	lenght                  { checkIndex $1 }
 						      |	  lenght ',' lenghtList   { (checkIndex $1)++$3 }
@@ -147,9 +146,6 @@ lenghtList 				: 	lenght                  { checkIndex $1 }
 lenght					:	ConstExpression     { $1 }
 
 --PointerType				: 	KW_POINTER_TO type
-
---ProcedureType 			:	KW_PROCEDURE
---						|	KW_PROCEDURE FormalParameters
 
 ConstDeclaration		: 	identifier '=' ConstExpression  {
                                                           do
@@ -458,7 +454,6 @@ factor	 				:	integerNum          { defaultAttribute { attributeType = Simple In
                                           else
                                             fatalError ("Invalid operation. Logical NOT operation is valid only with a BOOLEAN") (getRow (position $1)) (getCol (position $1))
                                       }
-
 --                | designator
 --                | designator ActualParameters
 
