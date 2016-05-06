@@ -35,11 +35,29 @@ data Program a =	Procedure a
 		|	While a
 		|	Loop a
 		|	Repeat a
-		|	Exit a
 		|	Return a
 		|	Break a
 		|	Return a
 		|	Program ( Program a ) deriving (Show)
+		
+k = 0		-- variabile necessaria per il numero di indentazioni
+		
+instance Pretty a => Pretty ( Program a ) where
+	pPrint ( Attribute a ) = text "VAR: " <> pPrint a
+	pPrint ( Procedure a ) = text "PROCEDURE: " <> pPrint a
+	pPrint ( Begin a ) = text "BEGIN: " <> pPrint a
+	pPrint ( End a ) = text "END: " <> pPrint a
+	pPrint ( Var a ) = text "VAR: " <> pPrint a
+	pPrint ( If a ) = text "IF" <> pPrint a
+	pPrint ( Elseif a ) = text "ELSEIF" <> pPrint a
+	pPrint ( Else a ) = text "ELSE" <> pPrint a
+	pPrint ( Case a ) = text "CASE: " <> pPrint a
+	pPrint ( While a ) = text "WHILE" <> pPrint a
+	pPrint ( Loop a ) = text "LOOP" <> pPrint a
+	pPrint ( Repeat a ) = text "REPEAT" <> pPrint a
+	pPrint ( Return a ) = text "RETURN" <> pPrint a
+	pPrint ( Break a ) = text "BREAK" <> pPrint a
+	pPrint ( Program p ) = vcat [ nest ( k + 1 ) ( pPrint p ) ]
 
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
  "PROCEDURE"      P         
@@ -54,7 +72,6 @@ data Program a =	Procedure a
  "WHILE"          P    
  "LOOP"		  P
  "REPEAT"         P       
- "EXIT"           P         
  "RETURN"         P        
  "BREAK"          P         
  "CONTINUE"       P   
