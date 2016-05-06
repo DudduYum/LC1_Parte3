@@ -45,6 +45,8 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_If_Else (Attribute, [Operation], [Operation])
 				| OP_If_Elsif [(Attribute, [Operation])]
 				| OP_If_Elsif_Else ([(Attribute, [Operation])], [Operation])
+				| OP_Case (Attribute, [(Attribute, [Operation])])
+				| OP_Case_Else (Attribute, [(Attribute, [Operation])], [Operation])
 				| OP_While Attribute [Operation]
 				| OP_Repeat [Operation] Attribute
 				| OP_Loop [Operation]
@@ -59,6 +61,7 @@ data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tip
 								integerValue :: Integer,					-- Memorizza il valore intero per gli attributi di tipo INTEGER
 								charValue :: Char,							-- Memorizza il valore carattere per gli attributi di tipo CHAR
 								booleanValue :: Bool,						-- Memorizza il valore booleano per gli attributi di tipo BOOLEAN
+								--pointerToIdentifier :: String,				-- Memorizza l'identificativo della variabile a cui punta
 								stringArrayValue :: [String],				-- Memorizza il valore array di stringhe per gli attributi di tipo ARRAY n OF STRING
 								floatArrayValue :: [Float], 				-- Memorizza il valore array di float per gli attributi di tipo ARRAY n OF FLOAT
 								integerArrayValue :: [Integer],				-- Memorizza il valore array di interi per gli attributi di tipo ARRAY n OF INTEGER
@@ -70,6 +73,7 @@ data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tip
 								isConstant :: Bool,							-- Indica se questo attributo e' una costante o una variabile. Serve nel caso la costante o variabile sia definita all'interno della sezione di chiarazione di una procedura
 								isParameter :: Bool, 						-- Serve per sapere se questo attributo e' un parametro di una procedura
 								isPassedByReference :: Bool 				-- Serve per sapere, nel caso questo attributo sia un valore passato come argomento a una procedura, se l'argomento e' passato per riferimento
+								--uniqueID :: String
 							} deriving (Show, Eq)
 
 data Procedure = Procedure { 	procedureName 		:: String,
@@ -98,6 +102,7 @@ defaultAttribute = Attribute {	attributeName = "",
 								integerValue = 0,
 								charValue = ' ',
 								booleanValue = False,
+								--pointerToIdentifier = "",
 								stringArrayValue = [],
 								floatArrayValue = [],
 								integerArrayValue = [],
@@ -109,6 +114,7 @@ defaultAttribute = Attribute {	attributeName = "",
 								isConstant = False,
 								isParameter = False,
 								isPassedByReference = False }
+								--uniqueID = "" }
 
 defaultProcedure = Procedure { 	procedureName = "",
 								attributes = [],

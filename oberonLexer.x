@@ -66,6 +66,7 @@ tokens :-
   ")"                       { mkL Lex_KW_TokenClosedBracket }
   "["                       { mkL Lex_KW_TokenOpenSquareBracket }
   "]"                       { mkL Lex_KW_TokenClosedSquareBracket }
+  "|"                       { mkL Lex_KW_TokenPipe }
   \"                        { mkL Lex_KW_TokenDoubleQuotes }
 
   -- Variable/Constant/Procedure identifier
@@ -131,6 +132,7 @@ data LexClass =
   Lex_KW_TokenClosedBracket       |
   Lex_KW_TokenOpenSquareBracket   |
   Lex_KW_TokenClosedSquareBracket |
+  Lex_KW_TokenPipe                |
   Lex_KW_TokenDoubleQuotes        |
   Lex_TokenVariableIdentifier     |
   Lex_TokenIntegerNumber          |
@@ -194,6 +196,7 @@ mkL c (p, _, _, str) len =  let t = take len str
                                           Lex_KW_TokenClosedBracket       -> return (KW_TokenClosedBracket p)
                                           Lex_KW_TokenOpenSquareBracket   -> return (KW_TokenOpenSquareBracket p)
                                           Lex_KW_TokenClosedSquareBracket -> return (KW_TokenClosedSquareBracket p)
+                                          Lex_KW_TokenPipe                -> return (KW_TokenPipe p)
                                           Lex_KW_TokenDoubleQuotes        -> return (KW_TokenDoubleQuotes p)
                                           Lex_TokenVariableIdentifier     -> return (TokenVariableIdentifier t p)
                                           Lex_TokenIntegerNumber          -> return (TokenIntegerNumber ((read t) :: Integer) p)
@@ -260,6 +263,7 @@ data Token =
   KW_TokenClosedBracket           { position :: AlexPosn } |
   KW_TokenOpenSquareBracket       { position :: AlexPosn } |
   KW_TokenClosedSquareBracket     { position :: AlexPosn } |
+  KW_TokenPipe                    { position :: AlexPosn } |
   KW_TokenDoubleQuotes            { position :: AlexPosn } |
   TokenVariableIdentifier         { name    :: String,  position :: AlexPosn } |
   TokenIntegerNumber              { intVal  :: Integer, position :: AlexPosn } |

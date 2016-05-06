@@ -62,6 +62,7 @@ import OberonTools
   ')'         					{ KW_TokenClosedBracket _ }
   '['         					{ KW_TokenOpenSquareBracket _ }
   ']'         					{ KW_TokenClosedSquareBracket _ }
+  '|'                   { KW_TokenPipe _ }
   '"'                   { KW_TokenDoubleQuotes _ }
   identifier 			      { TokenVariableIdentifier name _ }
   integerNum            { TokenIntegerNumber intVal _ }
@@ -133,7 +134,7 @@ LoopStatementSequence : statement ';'                         { [$1] }
 statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
             |   ProcedureCall                           { $1 }
             |   IfStatement                             { $1 }
---            | CaseStatement
+            |   CaseStatement                           { $1 }
             |   KW_WHILE expression KW_DO LoopStatementSequence KW_END    { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
             |   KW_REPEAT LoopStatementSequence KW_UNTIL expression       { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Repeat (declarationListToOperationList $2) $4 ) } }
             |   KW_LOOP LoopStatementSequence KW_END                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Loop (declarationListToOperationList $2) ) } }
@@ -155,18 +156,13 @@ IfStatement : KW_IF expression KW_THEN StatementSequence KW_END                 
 ElseIfList  : KW_ELSIF expression KW_THEN StatementSequence               { [($2, (declarationListToOperationList $4))] }
             | KW_ELSIF expression KW_THEN StatementSequence ElseIfList    { [($2, (declarationListToOperationList $4))]++$5}
 
---CaseStatement       :   KW_CASE expression KW_OF Case KW_END
---            | KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
---            | KW_CASE expression KW_OF CaseList KW_END
---            | KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END
+CaseStatement   :   KW_CASE expression KW_OF CaseList KW_END                            { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Case ($2, $4)) } }
+                |   KW_CASE expression KW_OF CaseList KW_ELSE StatementSequence KW_END  { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Case_Else ($2, $4, (declarationListToOperationList $6))) } }
 
---Case          : CaseLabelList ':' StatementSequence
+Case  :   ConstExpression ':' StatementSequence   { ($1, (declarationListToOperationList $3)) }
 
---CaseLabelList       : CaseLabels
---            | CaseLabels ',' CaseLabelList
-
---CaseLabels        : ConstExpression
---            | ConstExpression '..' ConstExpression
+CaseList  : Case                { [$1] }
+          | Case '|' CaseList   { $1:$3 }
 
 ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
                       | ConstDeclaration ';' ConstDeclarationList   { $1:$3 }
