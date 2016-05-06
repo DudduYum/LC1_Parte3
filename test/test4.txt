@@ -1,0 +1,5 @@
+PROCEDURE p1;
+    CONST y = FALSE + 5;
+BEGIN
+    x := 5;
+END p1

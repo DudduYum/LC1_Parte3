@@ -1,0 +1,9 @@
+PROCEDURE p1;
+	CONST 	x = 4;
+BEGIN
+	CASE ch OF
+           "er": ReadNumber;
+         |  22: ReadString;
+        ELSE   SpecialChara;
+        END; 
+END p1

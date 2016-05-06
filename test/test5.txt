@@ -1,0 +1,48 @@
+ 
+PROCEDURE p1;
+	CONST 	x = "ciao";
+			y = 5+4-(2*x);
+BEGIN
+	x := 5;
+	z := test(x);
+	EXIT;
+	RETURN;
+	RETURN 5;
+	IF 5 = 5 THEN
+		f := 5;
+	ELSE
+		g := "c";
+	END;
+
+	IF FALSE THEN
+		kk := 6;
+	ELSIF 3 > 2 THEN
+		cc := 9;
+	END;
+
+	IF a = b THEN
+		kk := 6;
+	ELSIF 3 > 2 THEN
+		cc := 9;
+	ELSE
+		k := "ciccio";
+	END;
+
+	WHILE x < 5 DO
+		x := x+1;
+		BREAK;
+		CONTINUE;
+	END;
+
+	REPEAT
+		t := t+1;
+		BREAK;
+	UNTIL t < 6;
+
+	LOOP
+		s := v;
+	END;
+
+	h := v[5];
+	h := v[5][6];
+END p1

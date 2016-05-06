@@ -1,0 +1,8 @@
+PROCEDURE p1;
+    VAR i, j:INTEGER;
+BEGIN
+    IF (ch > "A") & (ch <= "Z") THEN ReadIdentifier;   
+    ELSIF (ch > "0") & (ch <= "9") THEN ReadNumber;
+    ELSIF ch = ad THEN ReadString;
+    END;
+END p1

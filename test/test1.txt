@@ -1,0 +1,7 @@
+PROCEDURE p1;
+    VAR i, j:INTEGER;
+BEGIN
+    WHILE j > 1 DO
+    j := j DIV 2; i := i+1;
+    END;
+END p1
