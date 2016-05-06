@@ -12,4 +12,10 @@ BEGIN
 	ELSE
 		g := "c";
 	END;
+
+	WHILE x < 5 DO
+		x := x+1;
+		BREAK;
+		CONTINUE;
+	END;
 END p1

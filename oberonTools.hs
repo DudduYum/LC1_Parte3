@@ -37,9 +37,12 @@ data BasicOperation = OP_add Attribute Attribute
 data Operation 	= OP_Assignment Attribute Attribute
 				| OP_ProcedureCall Attribute [Attribute]
 				| OP_Exit
+				| OP_Continue
+				| OP_Break
 				| OP_Return (Maybe Attribute)
 				| OP_If Attribute [Operation]
 				| OP_If_Else Attribute [Operation] [Operation]
+				| OP_While Attribute [Operation]
 				deriving (Show, Eq)
 
 data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tipo di attributo (float, integer, ecc)

@@ -122,16 +122,24 @@ DeclarationSequenceList : DeclarationSequence                         { $1 }
 StatementSequence   : statement ';'                     { [$1] }
                     | statement ';' StatementSequence   { $1:$3 }
 
+LoopStatementSequence : statement ';'                         { [$1] }
+                      | KW_BREAK ';'                          { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Break })] }
+                      | KW_CONTINUE ';'                       { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Continue })] }
+                      | statement ';' LoopStatementSequence   { [$1]++$3 }
+                      | KW_BREAK ';' LoopStatementSequence    { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Break })]++$3 }
+                      | KW_CONTINUE ';' LoopStatementSequence { [(defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Continue })]++$3 }
+
+
 statement   :   designator KW_Assignment expression     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Assignment $1 $3) } }
             |   ProcedureCall                           { $1 }
             |   IfStatement                             { $1 }
 --            | CaseStatement
---            | WhileStatement
+            |   KW_WHILE expression KW_DO LoopStatementSequence KW_END { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
 --            | RepeatStatement
 --            | LoopStatement
-            | KW_EXIT                                   { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Exit } }
-            | KW_RETURN                                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return Nothing) } }
-            | KW_RETURN expression                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return (Just $2)) } }
+            |   KW_EXIT                                   { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Exit } }
+            |   KW_RETURN                                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return Nothing) } }
+            |   KW_RETURN expression                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return (Just $2)) } }
 
 ProcedureCall : designator                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 []) } }
               | designator ActualParameters     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 $2) } }
@@ -159,8 +167,6 @@ IfStatement : KW_IF expression KW_THEN StatementSequence KW_END                 
 
 --CaseLabels        : ConstExpression
 --            | ConstExpression '..' ConstExpression
-
---WhileStatement      : KW_WHILE expression KW_DO StatementSequence KW_END
 
 --RepeatStatement     : KW_REPEAT StatementSequence KW_UNTIL expression
 
