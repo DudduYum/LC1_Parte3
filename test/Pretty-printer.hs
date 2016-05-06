@@ -23,7 +23,7 @@ instance Pretty a => Pretty ( Program a ) where
                                     
 -- nest si occupa dell'indentazione, dato il numero di volte da fare; con quello si può tenere conto di indentazioni precedenti, per esempio nel caso di funzioni/procedure annidate
 
-data Oberon a =		Procedure a
+data Program a =	Procedure a
 		|	Begin a
 		|	End a
 		|	Var a
@@ -39,7 +39,7 @@ data Oberon a =		Procedure a
 		|	Return a
 		|	Break a
 		|	Return a
-		|	Oberon ( Oberon a ) deriving (Show)
+		|	Program ( Program a ) deriving (Show)
 
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
  "PROCEDURE"      P         
