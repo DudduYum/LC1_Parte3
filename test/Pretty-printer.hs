@@ -24,6 +24,12 @@ data Program a =        Procedure ( Program a )
                
 instance Pretty a => Pretty ( Program a ) where
     pPrint ( Attribute a ) = text "VAR: " <> pPrint a
+	pPrint ( AttributeType a) = text "VARTYPE: " <> pPrint a
+	pPrint ( SimpleType a) = text "TYPE: " <> pPrint a
+	pPrint ( BasicOperation a ) = text "BASOP: " <> pPrint a
+	pPrint ( Operation a ) = text "OPER: " <> pPrint a
+	pPrint ( DeclarationType a) = text "DECTYPE: " <> pPrint a
+	pPrint ( Declaration a) = test "DECLA: " <> pPrint a
     pPrint ( Procedure p ) = vcat [ text "PROCEDURE: "
                                     , nest 1 ( pPrint p )]
                                     
