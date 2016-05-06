@@ -217,11 +217,10 @@ ConstDeclaration		: 	identifier '=' ConstExpression  {
 ConstExpression			  : 	expression      { $1 }
 
 designator    :	  identifier                      { defaultAttribute { attributeType = Simple Name, nameValue = (name $1) } }
---						  |	  identifier designatorHelper
+--						  |	  identifier designatorHelper     { defaultAttribute { attributeType = Simple Unknown, basicOperation = Just (OP_arr_ext (defaultAttribute { attributeType = Simple Name, nameValue = (name $1) }) $2) } }
 
---designatorHelper		: 	'.' designator
---						|	'[' ExpList ']'
---						|	'[' ExpList ']' designatorHelper
+--designatorHelper	:   '[' expression ']'                    { [$2] }
+--						      |	  '[' expression ']' designatorHelper   { $2:$4 }
 
 ExpList		:  expression              { [$1] }
 					|  expression ',' ExpList  { $1:$3 }
