@@ -10,7 +10,13 @@ import Text.PrettyPrint
 -- Qui bisognerà implementare la struttura dati utilizzata dal parser
 
 data Program a =        Procedure ( Program a )
-               |        Attribute a deriving (Show)
+               |        Attribute a
+			   |		AttributeType a
+			   |		SimpleType a 
+			   |		BasicOperation a
+			   |		Operation a
+			   |		DeclarationType a
+			   |		Declaration a deriving (Show)
                
                
 -- Si procede poi a definire come sarà l'indentazione per casi ( ricorsivamente )
