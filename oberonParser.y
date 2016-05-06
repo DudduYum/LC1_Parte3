@@ -134,9 +134,9 @@ statement   :   designator KW_Assignment expression     { defaultDeclaration { d
             |   ProcedureCall                           { $1 }
             |   IfStatement                             { $1 }
 --            | CaseStatement
-            |   KW_WHILE expression KW_DO LoopStatementSequence KW_END { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
---            | RepeatStatement
---            | LoopStatement
+            |   KW_WHILE expression KW_DO LoopStatementSequence KW_END    { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_While $2 (declarationListToOperationList $4) ) } }
+            |   KW_REPEAT LoopStatementSequence KW_UNTIL expression       { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Repeat (declarationListToOperationList $2) $4 ) } }
+            |   KW_LOOP LoopStatementSequence KW_END                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Loop (declarationListToOperationList $2) ) } }
             |   KW_EXIT                                   { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Exit } }
             |   KW_RETURN                                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return Nothing) } }
             |   KW_RETURN expression                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return (Just $2)) } }
@@ -152,8 +152,8 @@ IfStatement : KW_IF expression KW_THEN StatementSequence KW_END                 
 --            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_END
 --            | KW_IF expression KW_THEN StatementSequence ElseIfList KW_ELSE StatementSequence KW_END
 
---ElseIfList  : KW_ELSIF expression KW_THEN StatementSequence
---            | KW_ELSIF expression KW_THEN StatementSequence ElseIfList
+--ElseIfList  : KW_ELSIF expression KW_THEN StatementSequence               { [] }
+--            | KW_ELSIF expression KW_THEN StatementSequence ElseIfList    { }
 
 --CaseStatement       :   KW_CASE expression KW_OF Case KW_END
 --            | KW_CASE expression KW_OF Case KW_ELSE StatementSequence KW_END
@@ -167,10 +167,6 @@ IfStatement : KW_IF expression KW_THEN StatementSequence KW_END                 
 
 --CaseLabels        : ConstExpression
 --            | ConstExpression '..' ConstExpression
-
---RepeatStatement     : KW_REPEAT StatementSequence KW_UNTIL expression
-
---LoopStatement       : KW_LOOP StatementSequence KW_END
 
 ConstDeclarationList  : ConstDeclaration ';'                        { [$1] }
                       | ConstDeclaration ';' ConstDeclarationList   { $1:$3 }

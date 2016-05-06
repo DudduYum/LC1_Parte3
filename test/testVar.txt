@@ -18,4 +18,13 @@ BEGIN
 		BREAK;
 		CONTINUE;
 	END;
+
+	REPEAT
+		t := t+1;
+		BREAK;
+	UNTIL t < 6;
+
+	LOOP
+		s := v;
+	END;
 END p1
