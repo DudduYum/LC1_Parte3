@@ -14,6 +14,7 @@ data Program a =        Procedure ( Program a )
                
                
 -- Si procede poi a definire come sarà l'indentazione per casi ( ricorsivamente )
+-- Si prevede una struttura ad albero necessaria per eventuali annidamenti
                
 instance Pretty a => Pretty ( Program a ) where
     pPrint ( Attribute a ) = text "VAR: " <> pPrint a
@@ -22,11 +23,30 @@ instance Pretty a => Pretty ( Program a ) where
                                     
 -- nest si occupa dell'indentazione, dato il numero di volte da fare; con quello si può tenere conto di indentazioni precedenti, per esempio nel caso di funzioni/procedure annidate
 
+data Oberon a =		Procedure a
+		|	Begin a
+		|	End a
+		|	Var a
+		|	Adding a			-- assegnamento, da controllare
+		|	If a
+		|	Elseif a
+		|	Else a
+		|	Case a
+		|	While a
+		|	Loop a
+		|	Repeat a
+		|	Exit a
+		|	Return a
+		|	Break a
+		|	Return a
+		|	Oberon ( Oberon a ) deriving (Show)
+
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
  "PROCEDURE"      P         
  "BEGIN"          P        
  "END"            P         
- "VAR"            A        
+ "VAR"            A
+ assegnamenti     A
  "IF"             P         
  "ELSIF"          P         
  "ELSE"           P         
