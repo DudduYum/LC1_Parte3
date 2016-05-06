@@ -40,8 +40,10 @@ data Operation 	= OP_Assignment Attribute Attribute
 				| OP_Continue
 				| OP_Break
 				| OP_Return (Maybe Attribute)
-				| OP_If Attribute [Operation]
-				| OP_If_Else Attribute [Operation] [Operation]
+				| OP_If (Attribute, [Operation])
+				| OP_If_Else (Attribute, [Operation], [Operation])
+				| OP_If_Elsif [(Attribute, [Operation])]
+				| OP_If_Elsif_Else ([(Attribute, [Operation])], [Operation])
 				| OP_While Attribute [Operation]
 				| OP_Repeat [Operation] Attribute
 				| OP_Loop [Operation]

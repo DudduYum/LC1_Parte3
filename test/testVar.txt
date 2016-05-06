@@ -13,6 +13,20 @@ BEGIN
 		g := "c";
 	END;
 
+	IF FALSE THEN
+		kk := 6;
+	ELSIF 3 > 2 THEN
+		cc := 9;
+	END;
+
+	IF a = b THEN
+		kk := 6;
+	ELSIF 3 > 2 THEN
+		cc := 9;
+	ELSE
+		k := "ciccio";
+	END;
+
 	WHILE x < 5 DO
 		x := x+1;
 		BREAK;
