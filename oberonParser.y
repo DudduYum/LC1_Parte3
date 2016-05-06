@@ -14,7 +14,6 @@ import OberonTools
   KW_REAL               { KW_TokenReal _ }
   KW_BOOLEAN            { KW_TokenBoolean _ }
   KW_CHAR               { KW_TokenChar _ }
-  KW_SET                { KW_TokenSet _ }
   KW_ARRAY              { KW_TokenArray _ }
   KW_OF                 { KW_TokenOf _ }
   KW_POINTER_TO         { KW_TokenPointerTo _ }
