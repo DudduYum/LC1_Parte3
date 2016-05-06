@@ -4,4 +4,7 @@ PROCEDURE p1;
 BEGIN
 	x := 5;
 	z := test(x);
+	EXIT;
+	RETURN;
+	RETURN 5;
 END p1

@@ -129,9 +129,9 @@ statement   :   designator KW_Assignment expression     { defaultDeclaration { d
 --            | WhileStatement
 --            | RepeatStatement
 --            | LoopStatement
---            | KW_EXIT
---            | KW_RETURN
---            | KW_RETURN expression
+            | KW_EXIT                                   { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just OP_Exit } }
+            | KW_RETURN                                 { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return Nothing) } }
+            | KW_RETURN expression                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_Return (Just $2)) } }
 
 ProcedureCall : designator                      { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 []) } }
               | designator ActualParameters     { defaultDeclaration { declarationType = DT_Operation, operationDeclared = Just (OP_ProcedureCall $1 $2) } }

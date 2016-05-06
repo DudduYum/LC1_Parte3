@@ -1,7 +1,7 @@
 module OberonTools where
 
 data AttributeType 	= Simple SimpleType
-					| UnsizedArray AttributeType
+					| UnsizedArray AttributeType 	-- Questa tipologia di array, senza definizione della lunghezza, è usata per la dichiarazione dei parametri formali di una procedura
 					| Array Integer AttributeType
 --					| Pointer AttributeType
 					deriving (Show, Eq)
@@ -12,7 +12,7 @@ data SimpleType = String
 	| Integer
 	| Boolean
 	| Name
-	| Unknown
+	| Unknown 				-- Se un attributo e' di tipo Unknown significa che per calcolarlo e' necessario utilizzare una variabile, o una costante, e non si sa ancora di che tipo e'
 	| OperationResult
 	deriving (Show, Eq)
 
@@ -36,37 +36,38 @@ data BasicOperation = OP_add Attribute Attribute
 
 data Operation 	= OP_Assignment Attribute Attribute
 				| OP_ProcedureCall Attribute [Attribute]
+				| OP_Exit
+				| OP_Return (Maybe Attribute)
 --				| OP_If Attribute [Operation]
 				deriving (Show, Eq)
 
-data Attribute = Attribute {	attributeType :: AttributeType,
-								nameValue :: String,	-- Usato dalla regola di produzione di 'designator' per indicare il nome di un varibile, costante o procedure
-								attributeName :: String,
-								operationResultValue :: Maybe Attribute,
-								stringValue :: String,
-								floatValue :: Float,
-								integerValue :: Integer,
-								charValue :: Char,
-								booleanValue :: Bool,
-								stringArrayValue :: [String],
-								floatArrayValue :: [Float],
-								integerArrayValue :: [Integer],
-								charArrayValue :: [Char],
-								booleanArrayValue :: [Bool],
-								basicOperation :: Maybe BasicOperation,
-								procCallParams :: [Attribute],
-								isProcedureCall :: Bool,
-								isConstant :: Bool,
-								isParameter :: Bool,
-								isPassedByReference :: Bool } deriving (Show, Eq)
+data Attribute = Attribute {	attributeType :: AttributeType,				-- Indica il tipo di attributo (float, integer, ecc)
+								nameValue :: String,						-- Usato dalla regola di produzione di 'designator' per indicare il nome di un varibile, costante o procedura
+								attributeName :: String,					-- Indica il nome dell'attributo. Serve per identificare le variabili e le costanti.
+								operationResultValue :: Maybe Attribute,	-- Serve per indicare il valore di ritorno di una operazione
+								stringValue :: String,						-- Memorizza il valore stringa per gli attributi di tipo STRING
+								floatValue :: Float,						-- Memorizza il valore float per gli attributi di tipo FLOAT
+								integerValue :: Integer,					-- Memorizza il valore intero per gli attributi di tipo INTEGER
+								charValue :: Char,							-- Memorizza il valore carattere per gli attributi di tipo CHAR
+								booleanValue :: Bool,						-- Memorizza il valore booleano per gli attributi di tipo BOOLEAN
+								stringArrayValue :: [String],				-- Memorizza il valore array di stringhe per gli attributi di tipo ARRAY n OF STRING
+								floatArrayValue :: [Float], 				-- Memorizza il valore array di float per gli attributi di tipo ARRAY n OF FLOAT
+								integerArrayValue :: [Integer],				-- Memorizza il valore array di interi per gli attributi di tipo ARRAY n OF INTEGER
+								charArrayValue :: [Char],					-- Memorizza il valore array di caratteri per gli attributi di tipo ARRAY n OF CHAR
+								booleanArrayValue :: [Bool],				-- Memorizza il valore array di booleani per gli attributi di tipo ARRAY n OF BOOLEAN
+								basicOperation :: Maybe BasicOperation, 	-- Memorizza l'operazione da eseguire per gli attributi di tipo Unknown
+								procCallParams :: [Attribute],				-- Memorizza la lista di parametri per la chiamata di una procedura. Questo e' valido quando isProcedureCall e' True e attributeType e' Name
+								isProcedureCall :: Bool,					-- Indica se questo attributo e' in realta' una chiamata ad una procedura. Questo puo' essere valido quando attributeType e' Name
+								isConstant :: Bool,							-- Indica se questo attributo e' una costante o una variabile. Serve nel caso la costante o variabile sia definita all'interno della sezione di chiarazione di una procedura
+								isParameter :: Bool, 						-- Serve per sapere se questo attributo e' un parametro di una procedura
+								isPassedByReference :: Bool 				-- Serve per sapere, nel caso questo attributo sia un valore passato come argomento a una procedura, se l'argomento e' passato per riferimento
+							} deriving (Show, Eq)
 
 data Procedure = Procedure { 	procedureName 		:: String,
 								attributes 			:: [Attribute],
 								procedureProcedures :: [Procedure],
 								procedureOperations :: [Operation],
 								returnType 			:: Maybe AttributeType } deriving (Show, Eq)
-
-data Program = Program { programProcedures :: [Procedure] } deriving (Show)
 
 data DeclarationType 	= DT_Variable
 						| DT_Constant
