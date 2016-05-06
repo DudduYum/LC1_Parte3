@@ -30,7 +30,6 @@ instance Pretty a => Pretty ( Program a ) where
  "IF"             P         
  "ELSIF"          P         
  "ELSE"           P         
- "THEN"           P         
  "CASE"           P         
  "WHILE"          P    
  "LOOP"		  P
