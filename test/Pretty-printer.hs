@@ -43,10 +43,9 @@ data Program a =	Procedure a
 k = 0		-- variabile necessaria per il numero di indentazioni
 		
 instance Pretty a => Pretty ( Program a ) where
-	pPrint ( Attribute a ) = text "VAR: " <> pPrint a
 	pPrint ( Procedure a ) = text "PROCEDURE: " <> pPrint a
 	pPrint ( Begin a ) = text "BEGIN: " <> pPrint a
-	pPrint ( End a ) = text "END: " <> pPrint a
+	pPrint ( End a ) = text "END: " <> pPrint a 	-- Aggiungere k - 1
 	pPrint ( Var a ) = text "VAR: " <> pPrint a
 	pPrint ( If a ) = text "IF" <> pPrint a
 	pPrint ( Elseif a ) = text "ELSEIF" <> pPrint a
@@ -55,8 +54,8 @@ instance Pretty a => Pretty ( Program a ) where
 	pPrint ( While a ) = text "WHILE" <> pPrint a
 	pPrint ( Loop a ) = text "LOOP" <> pPrint a
 	pPrint ( Repeat a ) = text "REPEAT" <> pPrint a
-	pPrint ( Return a ) = text "RETURN" <> pPrint a
-	pPrint ( Break a ) = text "BREAK" <> pPrint a
+	pPrint ( Return a ) = text "RETURN" <> pPrint a		-- Aggiungere k - 1
+	pPrint ( Break a ) = text "BREAK" <> pPrint a		-- Aggiungere k - 1
 	pPrint ( Program p ) = vcat [ nest ( k + 1 ) ( pPrint p ) ]
 
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
