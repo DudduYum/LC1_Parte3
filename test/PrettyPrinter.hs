@@ -34,7 +34,7 @@ instance Pretty a => Pretty ( Program a ) where
                                     , nest 1 ( pPrint p )]
                                     
 -- nest si occupa dell'indentazione, dato il numero di volte da fare; con quello si può tenere conto di indentazioni precedenti, per esempio nel caso di funzioni/procedure annidate
-
+{-
 data Program a =	Procedure a
 		|	Begin a
 		|	End a
@@ -69,7 +69,7 @@ instance Pretty a => Pretty ( Program a ) where
 	pPrint ( Return a ) = text "RETURN" <> pPrint a		-- Aggiungere k - 1
 	pPrint ( Break a ) = text "BREAK" <> pPrint a		-- Aggiungere k - 1
 	pPrint ( Program p ) = vcat [ nest ( k + 1 ) ( pPrint p ) ]
-
+-}
 {- con Procedure e Attribute che possono essere uno tra i seguenti:       ( A > attributes, P > procedures )
  "PROCEDURE"      P         
  "BEGIN"          P        
